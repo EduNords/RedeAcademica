@@ -1,0 +1,231 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rede Acadêmica - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+    <header>
+        <a href="{% url 'dashboard' %}" class="logo-link">
+            <div class="logo-simple">REDE ACADÊMICA</div>
+        </a>
+        <div class="header-icons">
+            <button class="icon-btn">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="icon-btn notification-btn">
+                <i class="fas fa-bell"></i>
+                {% if notificacoes_nao_lidas > 0 %}
+                    <span class="notification-badge">{{ notificacoes_nao_lidas }}</span>
+                {% endif %}
+            </button>
+            <div class="user-avatar-btn">
+                <img src="{{ user.avatar.url|default:'/static/images/default-avatar.png' }}" alt="Avatar de {{ user.fullname }}">
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <div class="welcome">Bem-vindo(a), {{ user.fullname|default:user.username }}</div>
+                <div class="welcome-subtitle">{{ data_formatada }}</div>
+            </div>
+            
+            <div class="logo-section">
+                <div class="logo-icon">∞</div>
+                <div class="logo-text-container">
+                    <div class="logo-text">REDE</div>
+                    <div class="logo-subtitle">ACADÊMICA</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Canais Disponíveis Section -->
+            <div class="section canais-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-comments"></i>
+                        Seus Canais
+                    </h2>
+                    <button class="btn-novo-canal">
+                        <i class="fas fa-plus"></i>
+                        Novo Canal
+                    </button>
+                </div>
+
+                {% if canais_disponiveis %}
+                    <div class="canais-grid">
+                        {% for canal in canais_disponiveis %}
+                        <a href="{% url 'chat' canal.id %}" class="canal-card">
+                            <div class="canal-header">
+                                <div class="canal-info">
+                                    <i class="fas {% if canal.tipo == 'publico' %}fa-globe{% elif canal.tipo == 'privado' %}fa-lock{% else %}fa-shield-alt{% endif %} canal-icon"></i>
+                                    <div>
+                                        <h3 class="canal-nome">{{ canal.nome }}</h3>
+                                        <p class="canal-tipo">{{ canal.get_tipo_display }}</p>
+                                    </div>
+                                </div>
+                                {% if canal.mensagens_nao_lidas > 0 %}
+                                    <span class="mensagens-badge">{{ canal.mensagens_nao_lidas }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if canal.descricao %}
+                                <p class="canal-descricao">{{ canal.descricao|truncatewords:15 }}</p>
+                            {% endif %}
+
+                            {% if canal.tipo == 'restrito' and canal.cargos_permitidos.all %}
+                                <div class="canal-cargos">
+                                    {% for cargo in canal.cargos_permitidos.all|slice:":3" %}
+                                        <span class="cargo-badge" style="background-color: {{ cargo.cor }}20; color: {{ cargo.cor }}; border-color: {{ cargo.cor }};">
+                                            {{ cargo.nome }}
+                                        </span>
+                                    {% endfor %}
+                                    {% if canal.cargos_permitidos.all|length > 3 %}
+                                        <span class="cargo-badge-more">+{{ canal.cargos_permitidos.all|length|add:"-3" }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            <div class="canal-footer">
+                                <span class="canal-membros">
+                                    <i class="fas fa-users"></i>
+                                    {{ canal.membros.count }} membro{{ canal.membros.count|pluralize }}
+                                </span>
+                                {% if canal.ultima_mensagem %}
+                                    <span class="canal-ultima-msg">
+                                        <i class="far fa-clock"></i>
+                                        {{ canal.ultima_mensagem.created_at|timesince }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-comments-slash"></i>
+                        <p>Você ainda não tem acesso a nenhum canal.</p>
+                        <p class="empty-state-hint">Configure seus cargos no perfil ou crie um novo canal!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Meus Cargos Section -->
+            <div class="section cargos-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-id-badge"></i>
+                        Meus Cargos
+                    </h2>
+                    <a href="{% url 'perfil' %}" class="btn-editar-cargos">
+                        <i class="fas fa-edit"></i>
+                        Gerenciar
+                    </a>
+                </div>
+
+                {% if meus_cargos %}
+                    <div class="cargos-list">
+                        {% for usuario_cargo in meus_cargos %}
+                            <div class="cargo-item" style="border-left-color: {{ usuario_cargo.cargo.cor }};">
+                                <div class="cargo-color" style="background-color: {{ usuario_cargo.cargo.cor }};"></div>
+                                <div class="cargo-info">
+                                    <span class="cargo-nome">{{ usuario_cargo.cargo.nome }}</span>
+                                    {% if usuario_cargo.cargo.descricao %}
+                                        <span class="cargo-desc">{{ usuario_cargo.cargo.descricao|truncatewords:10 }}</span>
+                                    {% endif %}
+                                </div>
+                                <span class="cargo-data">
+                                    <i class="far fa-calendar"></i>
+                                    {{ usuario_cargo.atribuido_em|date:"d/m/Y" }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state-small">
+                        <i class="fas fa-user-tag"></i>
+                        <p>Você ainda não possui cargos.</p>
+                        <a href="{% url 'perfil' %}" class="btn-link">Adicionar cargos</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Calendar Section -->
+            <div class="section calendar-section">
+                <div class="calendar-header">
+                    <h3 class="calendar-month">{{ calendario.mes }}</h3>
+                    <div class="calendar-nav">
+                        <button class="nav-btn"><i class="fas fa-chevron-left"></i></button>
+                        <button class="nav-btn"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid">
+                    <div class="weekdays">
+                        {% for dia in calendario.dias_semana %}
+                        <div class="weekday">{{ dia }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="days">
+                        {% for dia in calendario.dias %}
+                            {% if dia %}
+                                <div class="day {% if dia == calendario.dia_atual %}today{% endif %}">{{ dia }}</div>
+                            {% else %}
+                                <div class="day"></div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Section -->
+            {% if eventos %}
+            <div class="section events-section">
+                <div class="events-title">
+                    <i class="fas fa-calendar-day"></i>
+                    {{ data_eventos }}
+                </div>
+                {% for evento in eventos %}
+                <div class="event-item {{ evento.cor }}">
+                    <div class="event-time-marker {{ evento.cor }}"></div>
+                    <div class="event-details">
+                        <h4>{{ evento.titulo }}</h4>
+                        <div class="event-time">
+                            <i class="far fa-clock"></i>
+                            {{ evento.horario }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Adiciona interatividade aos cards de canal
+        document.querySelectorAll('.canal-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Botão de novo canal
+        document.querySelector('.btn-novo-canal')?.addEventListener('click', function() {
+            window.location.href = "{% url 'criar_canal' %}";
+        });
+    </script>
+</body>
+</html>

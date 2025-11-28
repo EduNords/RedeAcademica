@@ -1,0 +1,467 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - {{ username }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/perfil.css' %}?v=2.0">
+    <style>
+        /* Critical styles to ensure layout works */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html, body {
+            background-color: #f8f9fa !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-family: 'M PLUS 1p', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+            color: #212529 !important;
+        }
+        
+        .container {
+            background-color: transparent !important;
+            max-width: 1200px !important;
+            margin: 0 auto !important;
+            padding: 32px 24px !important;
+        }
+        
+        .section {
+            background: white !important;
+            border-radius: 16px !important;
+            padding: 24px !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+            border: 1px solid #e9ecef !important;
+            margin-bottom: 24px !important;
+        }
+        
+        .profile-header-card {
+            background: white !important;
+            border-radius: 16px !important;
+            overflow: hidden !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+            border: 1px solid #e9ecef !important;
+            margin-bottom: 32px !important;
+        }
+        
+        .profile-banner {
+            height: 160px !important;
+            background: linear-gradient(135deg, #a8c5dd 0%, #7fa8c9 50%, #4a9fd8 100%) !important;
+        }
+        
+        .profile-content {
+            background: white !important;
+            padding: 0 32px 32px !important;
+        }
+        
+        .info-card {
+            background: #f8f9fa !important;
+            border: 1px solid #e9ecef !important;
+            border-radius: 12px !important;
+            padding: 20px !important;
+        }
+        
+        .cargo-card {
+            background: #f8f9fa !important;
+            border: 1px solid #e9ecef !important;
+            border-left-width: 4px !important;
+            border-radius: 12px !important;
+            padding: 20px !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="{% url 'dashboard' %}" class="logo-link">
+            <div class="logo-container">
+                <div class="logo-icon">∞</div>
+                <div class="logo-text-container">
+                    <div class="logo-text">REDE</div>
+                    <div class="logo-subtitle">ACADÊMICA</div>
+                </div>
+            </div>
+        </a>
+        <div class="header-icons">
+            <a href="{% url 'busca_usuarios' %}" class="icon-btn">
+                <i class="fas fa-search"></i>
+            </a>
+            <button class="icon-btn notification-btn">
+                <i class="fas fa-bell"></i>
+            </button>
+            <a href="{% url 'perfil' %}" class="user-avatar-btn">
+                <img src="{{ foto_url|default:'/static/images/default-avatar.png' }}" alt="Avatar de {{ username }}">
+            </a>
+        </div>
+    </header>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <i class="fas fa-check-circle"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <!-- Profile Header Card -->
+        <div class="profile-header-card">
+            <div class="profile-banner">
+                <div class="banner-gradient"></div>
+            </div>
+            
+            <div class="profile-content">
+                <div class="profile-avatar-wrapper">
+                    <img src="{{ foto_url|default:'/static/images/default-avatar.png' }}" alt="Foto de {{ username }}" class="profile-avatar" onerror="this.src='https://via.placeholder.com/120/4a9fd8/ffffff?text=User'">
+                    <div class="avatar-badge">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+
+                <div class="profile-header-info">
+                    <h1 class="profile-name">{{ nome_completo }}</h1>
+                    <p class="profile-username">@{{ username }}</p>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-id-badge"></i>
+                            <span>{{ meus_cargos|length }} cargo{{ meus_cargos|length|pluralize }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-circle" style="color: #28a745; font-size: 8px;"></i>
+                            <span>Ativo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-edit-profile" onclick="openEditModal()">
+                    <i class="fas fa-edit"></i>
+                    Editar Perfil
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-content">
+            <!-- Informações Pessoais -->
+            <div class="section info-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-circle"></i>
+                        Informações Pessoais
+                    </h2>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-details">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">{{ email }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <div class="info-details">
+                            <span class="info-label">Matrícula</span>
+                            <span class="info-value">{{ matricula }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="info-details">
+                            <span class="info-label">Usuário</span>
+                            <span class="info-value">{{ username }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="info-details">
+                            <span class="info-label">Membro desde</span>
+                            <span class="info-value">Outubro 2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meus Cargos -->
+            <div class="section cargos-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-id-badge"></i>
+                        Meus Cargos
+                    </h2>
+                    <button class="btn-manage-cargos" onclick="openCargosModal()">
+                        <i class="fas fa-cog"></i>
+                        Gerenciar
+                    </button>
+                </div>
+
+                {% if meus_cargos %}
+                    <div class="cargos-list">
+                        {% for usuario_cargo in meus_cargos %}
+                            <div class="cargo-card" style="border-left-color: {{ usuario_cargo.cargo.cor }};">
+                                <div class="cargo-color-indicator" style="background-color: {{ usuario_cargo.cargo.cor }};"></div>
+                                <div class="cargo-content">
+                                    <div class="cargo-header-info">
+                                        <h3 class="cargo-title">{{ usuario_cargo.cargo.nome }}</h3>
+                                        <span class="cargo-badge">Ativo</span>
+                                    </div>
+                                    {% if usuario_cargo.cargo.descricao %}
+                                        <p class="cargo-description">{{ usuario_cargo.cargo.descricao|truncatewords:15 }}</p>
+                                    {% endif %}
+                                    <div class="cargo-meta">
+                                        <span class="cargo-date">
+                                            <i class="far fa-calendar"></i>
+                                            Atribuído em {{ usuario_cargo.atribuido_em|date:"d/m/Y" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-user-tag"></i>
+                        <p>Você ainda não possui cargos atribuídos.</p>
+                        <button class="btn-add-cargo" onclick="openCargosModal()">
+                            <i class="fas fa-plus"></i>
+                            Adicionar Cargos
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Editar Perfil -->
+    <div class="modal-overlay" id="modalEditarPerfil">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <i class="fas fa-user-edit"></i>
+                    Editar Perfil
+                </h2>
+                <button class="modal-close" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="preview-section">
+                    <div class="preview-avatar">
+                        <img src="{{ foto_url|default:'/static/images/default-avatar.png' }}" alt="Preview" id="previewImg">
+                    </div>
+                    <p class="preview-label">Preview da Foto</p>
+                </div>
+
+                <div class="info-readonly">
+                    <div class="readonly-item">
+                        <span class="readonly-label">Usuário:</span>
+                        <span class="readonly-value">{{ username }}</span>
+                    </div>
+                    <div class="readonly-item">
+                        <span class="readonly-label">Matrícula:</span>
+                        <span class="readonly-value">{{ matricula }}</span>
+                    </div>
+                </div>
+
+                <form method="POST" action="{% url 'editar_perfil' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="simple">
+                    
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            value="{{ email }}"
+                            placeholder="seu.email@exemplo.com"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="foto_url">
+                            <i class="fas fa-image"></i>
+                            URL da Foto de Perfil
+                        </label>
+                        <input 
+                            type="url" 
+                            id="foto_url" 
+                            name="foto_url" 
+                            value="{{ foto_url }}"
+                            placeholder="https://exemplo.com/minha-foto.jpg"
+                        >
+                        <div class="form-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Cole o link direto de uma imagem
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i>
+                        Salvar Alterações
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Gerenciar Cargos -->
+    <div class="modal-overlay" id="modalCargos">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>
+                    <i class="fas fa-id-badge"></i>
+                    Gerenciar Cargos
+                </h2>
+                <button class="modal-close" onclick="closeCargosModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-info-banner">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>Dica:</strong> Clique em "Adicionar" ou "Remover" para gerenciar seus cargos
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <a href="{% url 'criar_cargo' %}" class="btn-create-cargo" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s ease;">
+                        <i class="fas fa-plus"></i>
+                        Criar Novo Cargo
+                    </a>
+                </div>
+
+                {% if todos_cargos %}
+                    <div class="cargos-modal-grid">
+                        {% for cargo in todos_cargos %}
+                        <div class="cargo-modal-card {% if cargo.id in cargos_usuario_ids %}active{% endif %}">
+                            <div class="cargo-modal-header">
+                                <div class="cargo-modal-color" style="background-color: {{ cargo.cor }};"></div>
+                                <div class="cargo-modal-info">
+                                    <h3 class="cargo-modal-name">{{ cargo.nome }}</h3>
+                                    {% if cargo.id in cargos_usuario_ids %}
+                                        <span class="cargo-status-badge active">
+                                            <i class="fas fa-check-circle"></i>
+                                            Ativo
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if cargo.descricao %}
+                                <p class="cargo-modal-desc">{{ cargo.descricao }}</p>
+                            {% endif %}
+
+                            <div class="cargo-modal-actions">
+                                {% if cargo.id in cargos_usuario_ids %}
+                                    <a href="{% url 'toggle_cargo' cargo.id %}" class="btn-cargo-action remove">
+                                        <i class="fas fa-times"></i>
+                                        Remover
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'toggle_cargo' cargo.id %}" class="btn-cargo-action add">
+                                        <i class="fas fa-plus"></i>
+                                        Adicionar
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-modal-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Nenhum cargo disponível no sistema.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal() {
+            document.getElementById('modalEditarPerfil').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEditModal() {
+            document.getElementById('modalEditarPerfil').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function openCargosModal() {
+            document.getElementById('modalCargos').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCargosModal() {
+            document.getElementById('modalCargos').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            const editModal = document.getElementById('modalEditarPerfil');
+            const cargosModal = document.getElementById('modalCargos');
+            
+            if (event.target == editModal) {
+                closeEditModal();
+            }
+            if (event.target == cargosModal) {
+                closeCargosModal();
+            }
+        }
+
+        // Preview da foto
+        const fotoInput = document.getElementById('foto_url');
+        const previewImg = document.getElementById('previewImg');
+
+        if (fotoInput && previewImg) {
+            fotoInput.addEventListener('input', function() {
+                const url = this.value.trim();
+                if (url) {
+                    previewImg.src = url;
+                    previewImg.onerror = function() {
+                        this.src = '/static/images/default-avatar.png';
+                    };
+                }
+            });
+        }
+
+        // Auto-hide messages
+        setTimeout(function() {
+            const messages = document.querySelector('.messages');
+            if (messages) {
+                messages.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => messages.remove(), 300);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

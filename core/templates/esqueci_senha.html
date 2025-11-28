@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConectPuc - Esqueci Minha Senha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Lato:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/esqueci_senha.css' %}">
+</head>
+<body>
+    <div class="forgot-wrapper">
+        <div class="welcome-section">
+            <div class="brand-logo">ConectPuc</div>
+            <h1 class="welcome-title">Recupere sua conta com segurança e velocidade</h1>
+            <p class="welcome-description">
+                Não se preocupe! Vamos te ajudar a recuperar o acesso à sua conta de forma segura e rápida.
+            </p>
+            
+            <ul class="security-features">
+                <li>Digite seu email de recuperação</li>
+                <li>Gere um token de verificação</li>
+                <li>Digite a nova senha</li>
+                <li>Confirme a nova senha</li>
+            </ul>
+            
+             <div class="security-card">
+                 <div class="security-icon">SSL</div>
+                 <div class="security-label">Conexão Segura</div>
+             </div>
+        </div>
+        
+        <div class="forgot-section">
+            <div class="forgot-header">
+                <h2 class="forgot-title">Esqueci Minha Senha</h2>
+                <p class="forgot-subtitle">Preencha os dados para recuperar sua conta</p>
+            </div>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <p class="alert alert-{{ message.tags }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- EMAIL -->
+                <div class="form-group">
+                    <label for="recovery-email">Email de Recuperação</label>
+                    <input 
+                        type="email" 
+                        id="recovery-email" 
+                        name="email" 
+                        placeholder="Digite seu email de recuperação"
+                        value="{{ email }}">
+                </div>
+
+                <!-- TOKEN + BOTÃO -->
+                <div class="token-row">
+                    <div class="form-group token-input">
+                        <label for="token">Token</label>
+                        <input type="text" id="token" name="token" placeholder="Digite o token recebido">
+                    </div>
+
+                    <div class="btn-generate-container">
+                        <button type="submit" name="action" value="send_token" class="btn-generate">
+                            Gerar Token
+                        </button>
+                    </div>
+                </div>
+
+                <div class="token-info">
+                    O token será enviado para o email preenchido acima.
+                </div>
+
+                <!-- NOVA SENHA -->
+                <div class="password-row">
+                    <div class="form-group">
+                        <label for="new-password">Nova Senha</label>
+                        <input type="password" id="new-password" name="password" placeholder="Digite sua nova senha">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-password">Confirmar Nova Senha</label>
+                        <input type="password" id="confirm-password" name="confirm_password" placeholder="Confirme sua nova senha">
+                    </div>
+                </div>
+                
+                <button type="submit" name="action" value="reset_password" class="btn-primary">
+                    Trocar Senha
+                </button>
+            </form>
+            
+            <div class="divider">
+                <span>Lembrou da senha?</span>
+            </div>
+            
+            <div class="back-link">
+                <a href="{% url 'logando' %}">Voltar ao Login</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

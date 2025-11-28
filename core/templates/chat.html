@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ canal.nome }} - Rede Acadêmica</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+</head>
+<body>
+    <header class="chat-header">
+        <div class="header-left">
+            <a href="{% url 'dashboard' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="canal-info">
+                <h1 class="canal-nome">{{ canal.avatar }} {{ canal.nome }}</h1>
+                <p class="canal-tipo">
+                    <i class="fas {% if canal.tipo == 'publico' %}fa-globe{% elif canal.tipo == 'privado' %}fa-lock{% else %}fa-shield-alt{% endif %}"></i>
+                    {{ canal.get_tipo_display }} • {{ canal.membros.count }} membros
+                </p>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="icon-btn" title="Informações do canal">
+                <i class="fas fa-info-circle"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="chat-container">
+        <div class="messages-area">
+            {% if mensagens %}
+                {% for mensagem in mensagens %}
+                <div class="message-item {% if mensagem.autor == user %}own-message{% endif %}">
+                    <img src="{{ mensagem.autor.foto_url }}" alt="{{ mensagem.autor.username }}" class="message-avatar">
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">{{ mensagem.autor.fullname|default:mensagem.autor.username }}</span>
+                            <span class="message-time">{{ mensagem.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="message-text">{{ mensagem.conteudo }}</div>
+                        {% if mensagem.arquivo %}
+                        <div class="message-attachment">
+                            <i class="fas fa-file"></i>
+                            <a href="{{ mensagem.arquivo.url }}" target="_blank">Arquivo anexado</a>
+                        </div>
+                        {% endif %}
+                        {% if mensagem.editada %}
+                        <span class="message-edited">(editada)</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-chat">
+                    <i class="fas fa-comments"></i>
+                    <p>Nenhuma mensagem ainda</p>
+                    <p class="empty-hint">Seja o primeiro a enviar uma mensagem!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="message-input-area">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data" class="message-form">
+                {% csrf_token %}
+                <div class="input-wrapper">
+                    <textarea 
+                        name="conteudo" 
+                        placeholder="Digite sua mensagem..." 
+                        rows="1"
+                        class="message-input"
+                        required
+                    ></textarea>
+                    <div class="input-actions">
+                        <label for="arquivo" class="btn-attach">
+                            <i class="fas fa-paperclip"></i>
+                            <input type="file" name="arquivo" id="arquivo" style="display: none;">
+                        </label>
+                        <button type="submit" class="btn-send">
+                            <i class="fas fa-paper-plane"></i>
+                            Enviar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Auto-resize textarea
+        const textarea = document.querySelector('.message-input');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Scroll to bottom
+        const messagesArea = document.querySelector('.messages-area');
+        if (messagesArea) {
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        // Show file name
+        const fileInput = document.getElementById('arquivo');
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                alert('Arquivo selecionado: ' + this.files[0].name);
+            }
+        });
+    </script>
+</body>
+</html>

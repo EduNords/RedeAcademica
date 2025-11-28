@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Usuários - Rede Acadêmica</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/pesquisa.css' %}?v=2.0">
+</head>
+<body>
+    <header>
+        <a href="{% url 'dashboard' %}" class="logo-link">
+            <div class="logo-container">
+                <div class="logo-icon">∞</div>
+                <div class="logo-text-container">
+                    <div class="logo-text">REDE</div>
+                    <div class="logo-subtitle">ACADÊMICA</div>
+                </div>
+            </div>
+        </a>
+        <div class="header-icons">
+            <a href="{% url 'busca_usuarios' %}" class="icon-btn active">
+                <i class="fas fa-search"></i>
+            </a>
+            <button class="icon-btn notification-btn">
+                <i class="fas fa-bell"></i>
+                {% if usuario_logado.notificacoes > 0 %}
+                    <span class="notification-badge">{{ usuario_logado.notificacoes }}</span>
+                {% endif %}
+            </button>
+            <a href="{% url 'perfil' %}" class="user-avatar-btn">
+                <img src="{{ usuario_logado.foto_url|default:'/static/images/default-avatar.png' }}" alt="Avatar de {{ usuario_logado.username }}">
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-search"></i>
+                    Buscar Usuários
+                </h2>
+            </div>
+
+            <div class="search-box">
+                <form method="GET" action="{% url 'busca_usuarios' %}" class="search-form">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input 
+                            type="text" 
+                            name="q" 
+                            value="{{ query }}" 
+                            placeholder="Digite o nome ou username do usuário..." 
+                            class="search-input" 
+                            autofocus
+                        />
+                        {% if query %}
+                            <button type="button" class="clear-search-btn" onclick="clearSearch()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </form>
+
+                {% if pesquisas_recentes %}
+                <div class="recent-searches">
+                    <div class="recent-header">
+                        <span class="recent-title">
+                            <i class="fas fa-clock"></i>
+                            Pesquisas Recentes
+                        </span>
+                        <button class="clear-all-btn" onclick="clearAllSearches()">
+                            <i class="fas fa-trash"></i>
+                            Limpar tudo
+                        </button>
+                    </div>
+                    <ul class="user-list">
+                        {% for usuario in pesquisas_recentes %}
+                        <li class="user-list-item">
+                            <div class="user-item-content">
+                                <i class="fas fa-user-circle user-item-icon"></i>
+                                <span class="user-item-name">{{ usuario }}</span>
+                            </div>
+                            <button class="delete-btn" onclick="removeRecent('{{ usuario }}')" title="Remover">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- User Info Section -->
+        {% if usuario_selecionado %}
+        <div class="user-info-section">
+            <div class="user-profile-card">
+                <div class="profile-header">
+                    <div class="left-profile">
+                        <div class="profile-pic-wrapper">
+                            <img 
+                                src="{{ usuario_selecionado.foto_url|default:'/static/images/default-avatar.png' }}" 
+                                alt="Foto de {{ usuario_selecionado.username }}" 
+                                class="profile-pic"
+                                onerror="this.src='https://via.placeholder.com/120/4a9fd8/ffffff?text=User'"
+                            />
+                            <div class="profile-status">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                        </div>
+                        <h2 class="username">@{{ usuario_selecionado.username }}</h2>
+                    </div>
+
+                    <div class="right-profile">
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-value">{{ usuario_selecionado.seguidores|default:0 }}</span>
+                                <span class="stat-label">Seguidores</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">{{ usuario_selecionado.seguindo|default:0 }}</span>
+                                <span class="stat-label">Seguindo</span>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="btn-action btn-follow">
+                                <i class="fas fa-user-plus"></i>
+                                Seguir
+                            </button>
+                            <button class="btn-action btn-chat">
+                                <i class="fas fa-comment"></i>
+                                Chat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <i class="fas fa-id-badge"></i>
+                            <h3>Cargos</h3>
+                        </div>
+                        <div class="detail-content">
+                            {% if usuario_selecionado.cargos %}
+                                <div class="cargos-tags">
+                                    {% for cargo in usuario_selecionado.cargos %}
+                                        <span class="cargo-tag">{{ cargo }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="empty-detail">Nenhum cargo atribuído</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h3>Sobre</h3>
+                        </div>
+                        <div class="detail-content">
+                            {% if usuario_selecionado.descricao %}
+                                <p class="bio-text">{{ usuario_selecionado.descricao }}</p>
+                            {% else %}
+                                <p class="empty-detail">Nenhuma descrição disponível</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state-section">
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h3>Busque por usuários</h3>
+                <p>Digite o nome ou username na barra de pesquisa para encontrar usuários na plataforma.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function clearSearch() {
+            const input = document.querySelector('.search-input');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function clearAllSearches() {
+            if (confirm('Deseja limpar todas as pesquisas recentes?')) {
+                // Implementar lógica para limpar pesquisas recentes
+                const userList = document.querySelector('.user-list');
+                if (userList) {
+                    userList.innerHTML = '';
+                }
+            }
+        }
+
+        function removeRecent(username) {
+            // Implementar lógica para remover pesquisa recente específica
+            const item = event.target.closest('.user-list-item');
+            if (item) {
+                item.remove();
+            }
+        }
+
+        // Auto-submit form on Enter
+        document.querySelector('.search-input')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.closest('form').submit();
+            }
+        });
+    </script>
+</body>
+</html>

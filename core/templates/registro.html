@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rede Acadêmica - Criar Conta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Lato:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/registro.css' %}" />
+</head>
+<body>
+    <div class="register-wrapper">
+        <div class="welcome-section">
+            <div class="brand-logo">Rede Acadêmica</div>
+            <h1 class="welcome-title">Faça parte da maior rede de networking acadêmico</h1>
+            <p class="welcome-description">
+                Junte-se a outros estudantes e expanda suas conexões acadêmicas e profissionais.
+            </p>
+            
+            <ul class="benefits-list">
+                <li>Networking entre estudantes</li>
+                <li>Grupos de estudo colaborativos</li>
+                <li>Avisos de vagas e oportunidades</li>
+                <li>Eventos organizados pela comunidade</li>
+            </ul>
+            
+            <div class="call-to-action-grid">
+                <div class="call-to-action-item">
+                    <div class="call-to-action-text">Junte-se à nossa comunidade acadêmica!</div>
+                    <div class="call-to-action-subtext">Crie sua conta agora e comece a expandir sua rede de contatos profissionais e se desenvolva com pessoas que já enfrentaram os mesmos desafios</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="register-section">
+            <div class="register-header">
+                <h2 class="register-title">Criar Conta</h2>
+                <p class="register-subtitle">Preencha seus dados para começar</p>
+            </div>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-error">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="id_fullname">Nome Completo</label>
+                    {{ form.fullname }}
+                    {% if form.fullname.errors %}
+                        <div class="error-message">
+                            {% for error in form.fullname.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_username">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="error-message">
+                                {% for error in form.username.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_matricula">Matrícula</label>
+                        {{ form.matricula }}
+                        {% if form.matricula.errors %}
+                            <div class="error-message">
+                                {% for error in form.matricula.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_email">E-mail Acadêmico</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="error-message">
+                            {% for error in form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_password1">Senha</label>
+                    {{ form.password1 }}
+                    <div class="password-strength">Mínimo 8 caracteres com letras, números e símbolos</div>
+                    {% if form.password1.errors %}
+                        <div class="error-message">
+                            {% for error in form.password1.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password2">Confirmar Senha</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="error-message">
+                            {% for error in form.password2.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="terms-agreement">
+                    <label for="id_terms">
+                        {{ form.terms }}
+                        <span>Concordo com os <a href="#" class="terms-link">Termos de Uso</a> e <a href="#" class="terms-link">Política de Privacidade</a> do ConectPuc</span>
+                    </label>
+                    {% if form.terms.errors %}
+                        <div class="error-message">
+                            {% for error in form.terms.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <button type="submit" class="btn-primary">Criar Minha Conta</button>
+            </form>
+            
+            <div class="divider">
+                <span>Já tem uma conta?</span>
+            </div>
+            
+            <div class="login-link">
+                <a href="{% url 'logando' %}">Fazer Login</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

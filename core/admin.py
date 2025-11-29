@@ -173,7 +173,7 @@ class NotificacaoAdmin(admin.ModelAdmin):
     marcar_como_nao_lida.short_description = 'Marcar como não lida'
 
 
-# ============ ADMIN PARA DASHBOARD ============
+# ADMIN PARA DASHBOARD 
 
 @admin.register(Novidade)
 class NovidadeAdmin(admin.ModelAdmin):
@@ -217,7 +217,7 @@ class EventoAdmin(admin.ModelAdmin):
     )
 
 
-# ============ ADMIN PARA BUSCA DE PERFIL ============
+# ADMIN PARA BUSCA DE PERFIL
 
 @admin.register(Seguidor)
 class SeguidorAdmin(admin.ModelAdmin):

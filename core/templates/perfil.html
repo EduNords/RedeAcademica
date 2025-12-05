@@ -1,27 +1,16 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil - {{ username }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/perfil.css' %}?v=2.0">
-    <style>
+
+{% block title %}Perfil - {{ user.username }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+<style>
         /* Critical styles to ensure layout works */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-        }
-        
-        html, body {
-            background-color: #f8f9fa !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            font-family: 'M PLUS 1p', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
-            color: #212529 !important;
         }
         
         .container {
@@ -74,41 +63,17 @@
             padding: 20px !important;
         }
     </style>
-</head>
-<body>
-    <header>
-        <a href="{% url 'dashboard' %}" class="logo-link">
-            <div class="logo-container">
-                <div class="logo-icon">∞</div>
-                <div class="logo-text-container">
-                    <div class="logo-text">REDE</div>
-                    <div class="logo-subtitle">ACADÊMICA</div>
-                </div>
-            </div>
-        </a>
-        <div class="header-icons">
-            <a href="{% url 'busca_usuarios' %}" class="icon-btn">
-                <i class="fas fa-search"></i>
-            </a>
-            <button class="icon-btn notification-btn">
-                <i class="fas fa-bell"></i>
-            </button>
-            <a href="{% url 'perfil' %}" class="user-avatar-btn">
-                <img src="{{ foto_url|default:'/static/images/default-avatar.png' }}" alt="Avatar de {{ username }}">
-            </a>
-        </div>
-    </header>
+{% endblock %}
 
-    {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            <i class="fas fa-check-circle"></i>
-            {{ message }}
+{% block content %}
+    <div class="container">
+        <!-- Back to Dashboard Button -->
+        <div style="margin-bottom: 20px;">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Voltar ao Dashboard
+            </a>
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 
     <div class="container">
         <!-- Profile Header Card -->
@@ -464,4 +429,5 @@
         }, 3000);
     </script>
 </body>
-</html>
+    </div>
+    {% endblock %}

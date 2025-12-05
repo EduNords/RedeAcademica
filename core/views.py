@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
@@ -16,13 +16,16 @@ import calendar
 from .forms import (
     CustomUserCreationForm, EditarPerfilForm, 
     CriarCanalForm, EnviarMensagemForm,
-    BuscarUsuarioForm, CriarCargoForm, AlterarSenhaForm
+    BuscarUsuarioForm, CriarCargoForm, AlterarSenhaForm,
+    CriarEventoForm, EditarEventoForm
 )
 
 from .models import (
     CustomUser, Cargo, UsuarioCargo, Canal, MembroCanal, 
-    Mensagem, Notificacao, Novidade, Evento, Seguidor, PesquisaRecente, ChatRequest, CargoRequest
+    Mensagem, Notificacao, Novidade, Evento, Seguidor, PesquisaRecente, 
+    ChatRequest, CargoRequest, Disciplinas, Professores, Avaliacao, AvaliacaoDisciplina
 )
+from django.views.decorators.http import require_http_methods
 
 
 # AUTENTICAÇÃO 
@@ -156,6 +159,7 @@ Equipe Rede Acadêmica
 # DASHBOARD 
 
 @login_required
+@login_required
 def dashboard(request):
     user = request.user
     hoje = datetime.now()
@@ -258,7 +262,20 @@ def dashboard(request):
         lida=False
     ).count()
     
-    # Calendário
+    # Calendário - suporta navegação de mês
+    mes_param = request.GET.get('mes')
+    if mes_param:
+        try:
+            ano_mes = datetime.strptime(mes_param, '%Y-%m')
+            ano_cal = ano_mes.year
+            mes_cal = ano_mes.month
+        except:
+            ano_cal = hoje.year
+            mes_cal = hoje.month
+    else:
+        ano_cal = hoje.year
+        mes_cal = hoje.month
+    
     dia_selecionado = request.GET.get('dia')
     
     if dia_selecionado:
@@ -269,8 +286,24 @@ def dashboard(request):
     else:
         data_selecionada = hoje.date()
     
-    cal = calendar.monthcalendar(hoje.year, hoje.month)
+    cal = calendar.monthcalendar(ano_cal, mes_cal)
     dias_semana_cal = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+    meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+             'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+    mes_nome_cal = meses[mes_cal - 1]
+    
+    # Eventos por dia do mês para marcar no calendário
+    eventos_por_dia = {}
+    eventos_mes = Evento.objects.filter(
+        ativo=True,
+        data__year=ano_cal,
+        data__month=mes_cal
+    )
+    for evento in eventos_mes:
+        dia = evento.data.day
+        if dia not in eventos_por_dia:
+            eventos_por_dia[dia] = []
+        eventos_por_dia[dia].append(evento)
     
     dias_calendario = []
     for semana in cal:
@@ -278,23 +311,26 @@ def dashboard(request):
             dias_calendario.append(dia if dia != 0 else None)
     
     calendario = {
-        'mes': f'{mes_nome} {hoje.year}',
+        'mes': f'{mes_nome_cal} {ano_cal}',
         'dias_semana': dias_semana_cal,
         'dias': dias_calendario,
-        'dia_atual': hoje.day,
-        'dia_selecionado': data_selecionada.day if data_selecionada.month == hoje.month else None,
-        'mes_atual': hoje.month,
-        'ano_atual': hoje.year,
+        'dia_atual': hoje.day if hoje.month == mes_cal and hoje.year == ano_cal else None,
+        'dia_selecionado': data_selecionada.day if data_selecionada.month == mes_cal and data_selecionada.year == ano_cal else None,
+        'mes_atual': mes_cal,
+        'ano_atual': ano_cal,
+        'eventos_por_dia': eventos_por_dia,
     }
     
-    # Eventos
+    # Eventos do dia selecionado
     eventos_db = Evento.objects.filter(
         data=data_selecionada,
         ativo=True
     ).order_by('horario_inicio')
     
     eventos = [{
+        'id': evt.id,
         'titulo': evt.titulo,
+        'descricao': evt.descricao,
         'horario': evt.horario_formatado(),
         'cor': evt.cor
     } for evt in eventos_db]
@@ -304,6 +340,7 @@ def dashboard(request):
         'user': user,
         'data_formatada': data_formatada,
         'data_eventos': f"{data_selecionada.day:02d}/{data_selecionada.month:02d}/{data_selecionada.year}",
+        'data_selecionada': data_selecionada,
         'novidades': novidades,
         'canais_disponiveis': canais_disponiveis,
         'meus_cargos': meus_cargos,
@@ -909,3 +946,220 @@ def recusar_cargo_request(request, request_id):
         'cargo_request': cargo_request
     }
     return render(request, 'recusar_cargo_request.html', context)
+
+@login_required
+def avaliacao_professores(request):
+    q = request.GET.get("q")
+
+    disciplina = None
+    professores_data = []
+
+    if q:
+        disciplina = Disciplinas.objects.filter(
+            Q(codigo__icontains=q) | Q(nome__icontains=q)
+        ).first()
+
+        if disciplina:
+            professores = Professores.objects.filter(disciplinas=disciplina)
+
+            for prof in professores:
+                avaliacoes = Avaliacao.objects.filter(professor=prof, disciplina=disciplina)
+                professores_data.append({
+                    "nome": prof.nome,
+                    "dominio": avaliacoes.aggregate(avg=Avg("dominio"))["avg"] or 0,
+                    "metodos": avaliacoes.aggregate(avg=Avg("metodos"))["avg"] or 0,
+                    "relacionamento": avaliacoes.aggregate(avg=Avg("relacionamento"))["avg"] or 0,
+                    "compatibilidade": avaliacoes.aggregate(avg=Avg("compatibilidade"))["avg"] or 0,
+                    "clareza": avaliacoes.aggregate(avg=Avg("clareza"))["avg"] or 0,
+                })
+
+    return render(request, "avaliacao_professores.html", {
+        "disciplina": disciplina,
+        "professores": professores_data,
+        "q": q,
+    })
+
+@login_required
+def avaliacao_disciplina(request):
+    q = request.GET.get("q")
+    disciplina = None
+    medias = {}
+
+    if q:
+        disciplina = Disciplinas.objects.filter(
+            Q(codigo__icontains=q) | Q(nome__icontains=q)
+        ).first()
+
+        if disciplina:
+            avaliacoes = AvaliacaoDisciplina.objects.filter(disciplina=disciplina)
+            medias = {
+                "contribuicao": avaliacoes.aggregate(Avg("contribuicao"))["contribuicao__avg"] or 0,
+                "equilibrio": avaliacoes.aggregate(Avg("equilibrio"))["equilibrio__avg"] or 0,
+                "aplicacao": avaliacoes.aggregate(Avg("aplicacao"))["aplicacao__avg"] or 0,
+                "material": avaliacoes.aggregate(Avg("material"))["material__avg"] or 0,
+                "distribuicao": avaliacoes.aggregate(Avg("distribuicao"))["distribuicao__avg"] or 0,
+            }
+
+    return render(request, "avaliacao_disciplina.html", {
+        "disciplina": disciplina,
+        "medias": medias,
+        "q": q,
+    })
+
+@login_required
+def avaliar_disciplina(request, codigo):
+    # 1. Buscar disciplina usando o código vindo da URL
+    disciplina = get_object_or_404(
+        Disciplinas,
+        Q(codigo__iexact=codigo) | Q(nome__iexact=codigo)
+    )
+
+    # 2. Se for POST, salvar avaliação
+    if request.method == "POST":
+        AvaliacaoDisciplina.objects.create(
+            disciplina=disciplina,
+            usuario=request.user,
+            contribuicao=request.POST["contribuicao"],
+            equilibrio=request.POST["equilibrio"],
+            aplicacao=request.POST["aplicacao"],
+            material=request.POST["material"],
+            distribuicao=request.POST["distribuicao"],
+            comentario=request.POST.get("comentario", "")
+        )
+
+        messages.success(request, 'Avaliação enviada com sucesso!')
+        return redirect(f"{reverse('avaliacao_disciplina')}?q={disciplina.codigo}")
+
+    # 3. Renderizar formulário
+    return render(request, "avalie_disciplina.html", {
+        "disciplina": disciplina,
+        "q": codigo,  # apenas para mostrar no campo de busca se precisar
+    })
+
+def telaavdisciplina1(request): return render(request, 'indexavdisciplina1.html')
+def telaavdisciplina2(request): return render(request, 'indexavdisciplina2.html')
+def telaavdisciplina3(request): return render(request, 'indexavdisciplina3.html')
+def tela_menu(request): return render(request, 'telamenu.html')
+
+
+# EVENTOS
+@login_required
+def listar_eventos(request):
+    # Data selecionada via GET
+    data_selecionada_str = request.GET.get('data')
+    data_selecionada = None
+    if data_selecionada_str:
+        try:
+            data_selecionada = datetime.strptime(data_selecionada_str, '%Y-%m-%d').date()
+            eventos = Evento.objects.filter(ativo=True, data=data_selecionada).order_by('horario_inicio')
+        except:
+            eventos = Evento.objects.filter(ativo=True).order_by('data', 'horario_inicio')
+    else:
+        eventos = Evento.objects.filter(ativo=True).order_by('data', 'horario_inicio')
+    
+    # Calendário do mês atual ou do mês da data selecionada
+    hoje = datetime.now()
+    if data_selecionada:
+        ano_cal = data_selecionada.year
+        mes_cal = data_selecionada.month
+    else:
+        ano_cal = hoje.year
+        mes_cal = hoje.month
+    
+    cal = calendar.monthcalendar(ano_cal, mes_cal)
+    dias_semana_cal = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+    meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+             'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+    
+    # Eventos por dia do mês
+    eventos_por_dia = {}
+    eventos_mes = Evento.objects.filter(
+        ativo=True,
+        data__year=ano_cal,
+        data__month=mes_cal
+    )
+    for evento in eventos_mes:
+        dia = evento.data.day
+        if dia not in eventos_por_dia:
+            eventos_por_dia[dia] = []
+        eventos_por_dia[dia].append(evento)
+    
+    calendario = {
+        'mes': f'{meses[mes_cal - 1]} {ano_cal}',
+        'dias_semana': dias_semana_cal,
+        'dias': [dia if dia != 0 else None for semana in cal for dia in semana],
+        'eventos_por_dia': eventos_por_dia,
+        'dia_atual': hoje.day if hoje.month == mes_cal and hoje.year == ano_cal else None,
+        'mes_atual': mes_cal,
+        'ano_atual': ano_cal,
+    }
+    
+    context = {
+        'eventos': eventos,
+        'calendario': calendario,
+        'data_selecionada': data_selecionada,
+    }
+    
+    return render(request, 'eventos/listar_eventos.html', context)
+
+@login_required
+def criar_evento(request):
+    if request.method == 'POST':
+        form = CriarEventoForm(request.POST)
+        if form.is_valid():
+            evento = form.save(commit=False)
+            evento.ativo = True
+            evento.save()
+            messages.success(request, 'Evento criado com sucesso!')
+            
+            # Redireciona para a data do evento
+            return redirect(f"{reverse('listar_eventos')}?data={evento.data}")
+        else:
+            messages.error(request, 'Por favor, corrija os erros abaixo.')
+    else:
+        # Se vier com data via GET, pré-preenche o formulário
+        data_preenchida = request.GET.get('data')
+        initial = {}
+        if data_preenchida:
+            try:
+                initial['data'] = datetime.strptime(data_preenchida, '%Y-%m-%d').date()
+            except:
+                pass
+        form = CriarEventoForm(initial=initial)
+    
+    context = {
+        'form': form,
+        'titulo': 'Criar Evento'
+    }
+    return render(request, 'eventos/form_evento.html', context)
+
+@login_required
+def editar_evento(request, evento_id):
+    evento = get_object_or_404(Evento, id=evento_id)
+    
+    if request.method == 'POST':
+        form = EditarEventoForm(request.POST, instance=evento)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Evento atualizado com sucesso!')
+            return redirect(f"{reverse('listar_eventos')}?data={evento.data}")
+        else:
+            messages.error(request, 'Por favor, corrija os erros abaixo.')
+    else:
+        form = EditarEventoForm(instance=evento)
+    
+    context = {
+        'form': form,
+        'evento': evento,
+        'titulo': 'Editar Evento'
+    }
+    return render(request, 'eventos/form_evento.html', context)
+
+@login_required
+def excluir_evento(request, evento_id):
+    evento = get_object_or_404(Evento, id=evento_id)
+    data_evento = evento.data
+    evento.ativo = False
+    evento.save()
+    messages.success(request, 'Evento excluído com sucesso!')
+    return redirect(f"{reverse('listar_eventos')}?data={data_evento}")

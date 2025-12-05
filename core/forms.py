@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser, Canal, Cargo
+from .models import CustomUser, Canal, Cargo, Evento
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -405,5 +405,167 @@ class AlterarSenhaForm(forms.Form):
             
             if len(nova_senha) < 8:
                 raise forms.ValidationError("A senha deve ter pelo menos 8 caracteres.")
+        
+        return cleaned_data
+
+
+class CriarEventoForm(forms.ModelForm):
+    titulo = forms.CharField(
+        max_length=300,
+        required=True,
+        label='Título do Evento',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ex: Reunião de Planejamento'
+        })
+    )
+    
+    descricao = forms.CharField(
+        required=False,
+        label='Descrição',
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Descreva o evento...',
+            'rows': 4
+        })
+    )
+    
+    data = forms.DateField(
+        required=True,
+        label='Data',
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        })
+    )
+    
+    horario_inicio = forms.TimeField(
+        required=True,
+        label='Horário de Início',
+        widget=forms.TimeInput(attrs={
+            'class': 'form-control',
+            'type': 'time'
+        })
+    )
+    
+    horario_fim = forms.TimeField(
+        required=True,
+        label='Horário de Fim',
+        widget=forms.TimeInput(attrs={
+            'class': 'form-control',
+            'type': 'time'
+        })
+    )
+    
+    cor = forms.ChoiceField(
+        choices=[
+            ('green', 'Verde'),
+            ('blue', 'Azul'),
+            ('red', 'Vermelho'),
+            ('yellow', 'Amarelo'),
+            ('purple', 'Roxo'),
+            ('orange', 'Laranja'),
+        ],
+        required=False,
+        initial='green',
+        label='Cor',
+        widget=forms.Select(attrs={
+            'class': 'form-control'
+        })
+    )
+    
+    class Meta:
+        model = Evento
+        fields = ('titulo', 'descricao', 'data', 'horario_inicio', 'horario_fim', 'cor')
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        horario_inicio = cleaned_data.get('horario_inicio')
+        horario_fim = cleaned_data.get('horario_fim')
+        
+        if horario_inicio and horario_fim:
+            if horario_fim <= horario_inicio:
+                raise forms.ValidationError("O horário de fim deve ser posterior ao horário de início.")
+        
+        return cleaned_data
+
+
+class EditarEventoForm(forms.ModelForm):
+    titulo = forms.CharField(
+        max_length=300,
+        required=True,
+        label='Título do Evento',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ex: Reunião de Planejamento'
+        })
+    )
+    
+    descricao = forms.CharField(
+        required=False,
+        label='Descrição',
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Descreva o evento...',
+            'rows': 4
+        })
+    )
+    
+    data = forms.DateField(
+        required=True,
+        label='Data',
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        })
+    )
+    
+    horario_inicio = forms.TimeField(
+        required=True,
+        label='Horário de Início',
+        widget=forms.TimeInput(attrs={
+            'class': 'form-control',
+            'type': 'time'
+        })
+    )
+    
+    horario_fim = forms.TimeField(
+        required=True,
+        label='Horário de Fim',
+        widget=forms.TimeInput(attrs={
+            'class': 'form-control',
+            'type': 'time'
+        })
+    )
+    
+    cor = forms.ChoiceField(
+        choices=[
+            ('green', 'Verde'),
+            ('blue', 'Azul'),
+            ('red', 'Vermelho'),
+            ('yellow', 'Amarelo'),
+            ('purple', 'Roxo'),
+            ('orange', 'Laranja'),
+        ],
+        required=False,
+        initial='green',
+        label='Cor',
+        widget=forms.Select(attrs={
+            'class': 'form-control'
+        })
+    )
+    
+    class Meta:
+        model = Evento
+        fields = ('titulo', 'descricao', 'data', 'horario_inicio', 'horario_fim', 'cor')
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        horario_inicio = cleaned_data.get('horario_inicio')
+        horario_fim = cleaned_data.get('horario_fim')
+        
+        if horario_inicio and horario_fim:
+            if horario_fim <= horario_inicio:
+                raise forms.ValidationError("O horário de fim deve ser posterior ao horário de início.")
         
         return cleaned_data

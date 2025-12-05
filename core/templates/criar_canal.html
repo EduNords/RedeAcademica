@@ -1,22 +1,20 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Canal - Rede Acadêmica</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Lato:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/criar_canal.css' %}">
-</head>
-<body>
-    <div class="page-wrapper">
-        <div class="header-bar">
-            <a href="{% url 'dashboard' %}" class="btn-back">
-                <i class="fas fa-arrow-left"></i>
-                Voltar ao Dashboard
-            </a>
-        </div>
+
+{% block title %}Criar Canal - Rede Acadêmica{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/criar_canal.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="header-bar">
+        <a href="{% url 'dashboard' %}" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Voltar ao Dashboard
+        </a>
+    </div>
 
         <div class="form-container">
             <div class="form-header">
@@ -132,5 +130,4 @@
             </form>
         </div>
     </div>
-</body>
-</html>
+{% endblock %}

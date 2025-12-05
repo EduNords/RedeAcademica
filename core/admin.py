@@ -3,7 +3,9 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     CustomUser, Cargo, UsuarioCargo, Canal, 
     MembroCanal, Mensagem, Reacao, Notificacao,
-    Novidade, Evento, Seguidor, PesquisaRecente, ChatRequest, CargoRequest
+    Novidade, Evento, Seguidor, PesquisaRecente,
+    ChatRequest, CargoRequest, AvaliacaoDisciplina, Disciplinas,
+    Professores, Avaliacao
 )
 
 
@@ -300,3 +302,30 @@ class CargoRequestAdmin(admin.ModelAdmin):
 admin.site.site_header = "Rede Acadêmica - Administração"
 admin.site.site_title = "Rede Acadêmica Admin"
 admin.site.index_title = "Painel de Controle"
+
+@admin.register(Disciplinas)
+class DisciplinasAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'codigo')
+
+@admin.register(AvaliacaoDisciplina)
+class AvaliacaoDisciplinaAdmin(admin.ModelAdmin):
+    list_display = ('disciplina', 'usuario', 'criado_em')
+    list_filter = ('disciplina', 'usuario', 'criado_em')
+    search_fields = ('usuario__username', 'disciplina__nome', 'disciplina__codigo')
+    date_hierarchy = 'criado_em'
+
+@admin.register(Professores)
+class ProfessoresAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'total_disciplinas')
+    search_fields = ('nome',)
+    filter_horizontal = ('disciplinas',)
+    
+    def total_disciplinas(self, obj):
+        return obj.disciplinas.count()
+    total_disciplinas.short_description = 'Total de Disciplinas'
+
+@admin.register(Avaliacao)
+class AvaliacaoAdmin(admin.ModelAdmin):
+    list_display = ('professor', 'disciplina', 'dominio', 'metodos', 'relacionamento', 'compatibilidade', 'clareza')
+    list_filter = ('professor', 'disciplina')
+    search_fields = ('professor__nome', 'disciplina__nome', 'disciplina__codigo')

@@ -1,3 +1,4 @@
+/* ===== Reset e Base ===== */
 * {
     margin: 0;
     padding: 0;
@@ -5,14 +6,15 @@
 }
 
 body {
-    font-family: 'Lato', sans-serif;
-    background: linear-gradient(135deg, #003366 0%, #004080 50%, #0066cc 100%);
+    font-family: 'M PLUS 1p', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #a8c5dd 0%, #7fa8c9 50%, #4a9fd8 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     overflow: hidden;
+    padding: 20px;
 }
 
 body::before {
@@ -22,7 +24,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23ffffff" opacity="0.1"/><circle cx="80" cy="30" r="1.5" fill="%23FFD43B" opacity="0.2"/><circle cx="40" cy="70" r="2.5" fill="%23ffffff" opacity="0.08"/><circle cx="90" cy="80" r="1" fill="%23FFD43B" opacity="0.15"/></svg>') repeat;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23ffffff" opacity="0.1"/><circle cx="80" cy="30" r="1.5" fill="%23ffffff" opacity="0.15"/><circle cx="40" cy="70" r="2.5" fill="%23ffffff" opacity="0.08"/><circle cx="90" cy="80" r="1" fill="%23ffffff" opacity="0.12"/></svg>') repeat;
     animation: float 20s infinite linear;
 }
 
@@ -31,22 +33,21 @@ body::before {
     100% { transform: translateY(-100px) rotate(360deg); }
 }
 
-    .forgot-wrapper {
-        display: flex;
-        max-width: 1000px;
-        width: 100%;
-        margin: 20px;
-        background: white;
-        border-radius: 24px;
-        box-shadow: 0 25px 60px rgba(0, 51, 102, 0.3);
-        overflow: hidden;
-        position: relative;
-        z-index: 1;
-    }
+.forgot-wrapper {
+    display: flex;
+    max-width: 1000px;
+    width: 100%;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 25px 60px rgba(44, 95, 127, 0.3);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
 
 .welcome-section {
     flex: 1;
-    background: linear-gradient(135deg, #003366 0%, #004080 100%);
+    background: linear-gradient(135deg, #2c5f7f 0%, #4a9fd8 100%);
     padding: 60px 40px;
     display: flex;
     flex-direction: column;
@@ -60,22 +61,21 @@ body::before {
     position: absolute;
     top: 0;
     right: 0;
-    width: 100px;
-    height: 100px;
-    background: radial-gradient(circle, rgba(255, 212, 59, 0.2) 0%, transparent 70%);
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     border-radius: 50%;
 }
 
 .brand-logo {
-    font-family: 'Nunito', sans-serif;
     font-weight: 700;
     font-size: 2.5em;
     margin-bottom: 20px;
-    color: #FFD43B;
+    color: white;
+    letter-spacing: 1px;
 }
 
 .welcome-title {
-    font-family: 'Nunito', sans-serif;
     font-weight: 600;
     font-size: 1.8em;
     margin-bottom: 15px;
@@ -85,7 +85,7 @@ body::before {
 .welcome-description {
     font-size: 1.1em;
     line-height: 1.6;
-    opacity: 0.9;
+    opacity: 0.95;
     margin-bottom: 30px;
 }
 
@@ -96,51 +96,50 @@ body::before {
 .security-features li {
     padding: 8px 0;
     font-size: 0.95em;
-    opacity: 0.8;
+    opacity: 0.9;
     position: relative;
     padding-left: 25px;
 }
 
-    .security-features li::before {
-        content: '→';
-        position: absolute;
-        left: 0;
-        font-size: 1.1em;
-        color: #FFD43B;
-        font-weight: bold;
-    }
+.security-features li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    font-size: 1.1em;
+    color: #a8c5dd;
+    font-weight: bold;
+}
 
-    .security-card {
-        background: linear-gradient(135deg, rgba(255, 212, 59, 0.1) 0%, rgba(255, 212, 59, 0.05) 100%);
-        border: 1px solid rgba(255, 212, 59, 0.2);
-        padding: 20px;
-        border-radius: 16px;
-        margin-top: 30px;
-        text-align: center;
-    }
+.security-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 20px;
+    border-radius: 16px;
+    margin-top: 30px;
+    text-align: center;
+}
 
-    .security-icon {
-        font-family: 'Nunito', sans-serif;
-        font-weight: 700;
-        font-size: 1.2em;
-        color: #FFD43B;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
+.security-icon {
+    font-weight: 700;
+    font-size: 1.2em;
+    color: white;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
 
-    .security-label {
-        font-size: 0.9em;
-        opacity: 0.8;
-    }
+.security-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
 
-    .forgot-section {
-        flex: 1.2;
-        padding: 60px 50px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
+.forgot-section {
+    flex: 1.2;
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
 .forgot-header {
     text-align: center;
@@ -148,15 +147,14 @@ body::before {
 }
 
 .forgot-title {
-    font-family: 'Nunito', sans-serif;
     font-weight: 700;
     font-size: 2em;
-    color: #003366;
+    color: #2c5f7f;
     margin-bottom: 10px;
 }
 
 .forgot-subtitle {
-    color: #7A7A7A;
+    color: #6c757d;
     font-size: 1.05em;
 }
 
@@ -167,83 +165,83 @@ body::before {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    color: #003366;
+    color: #2c5f7f;
     font-weight: 500;
     font-size: 0.95em;
 }
 
-    .form-group input {
-        width: 100%;
-        padding: 18px 22px;
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        font-size: 16px;
-        transition: all 0.3s ease;
-        font-family: 'Lato', sans-serif;
-        background: white;
-    }
+.form-group input {
+    width: 100%;
+    padding: 18px 22px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    font-family: 'M PLUS 1p', sans-serif;
+    background: white;
+}
 
 .form-group input:focus {
     outline: none;
-    border-color: #003366;
-    box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.1);
+    border-color: #4a9fd8;
+    box-shadow: 0 0 0 4px rgba(74, 159, 216, 0.1);
     transform: translateY(-2px);
 }
 
 .form-group input::placeholder {
-    color: #999;
+    color: #adb5bd;
 }
 
-    .password-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 25px;
-        margin-bottom: 25px;
-    }
+.password-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
 
-    .token-row {
-        display: flex;
-        gap: 15px;
-        align-items: end;
-        margin-bottom: 20px;
-    }
+.token-row {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    margin-bottom: 20px;
+}
 
-    .token-input {
-        flex: 1;
-    }
+.token-input {
+    flex: 1;
+}
 
-    .btn-generate-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: #f8f9fa;
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        padding: 20px 15px;
-        min-width: 160px;
-        height: 100%;
-    }
+.btn-generate-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px 15px;
+    min-width: 160px;
+    height: 100%;
+}
 
-    .btn-generate {
-        padding: 16px 24px;
-        background: linear-gradient(135deg, #003366 0%, #004080 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: 'Nunito', sans-serif;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        white-space: nowrap;
-        box-shadow: 0 4px 15px rgba(0, 51, 102, 0.3);
-        width: 100%;
-    }
+.btn-generate {
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #4a9fd8, #2c7fb8);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'M PLUS 1p', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(74, 159, 216, 0.3);
+    width: 100%;
+}
 
 .btn-generate:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 51, 102, 0.4);
+    box-shadow: 0 8px 25px rgba(74, 159, 216, 0.4);
 }
 
 .btn-generate:active {
@@ -253,22 +251,22 @@ body::before {
 .btn-primary {
     width: 100%;
     padding: 16px;
-    background: linear-gradient(135deg, #FFD43B 0%, #f0c419 100%);
-    color: #003366;
+    background: linear-gradient(135deg, #4a9fd8, #2c7fb8);
+    color: white;
     border: none;
     border-radius: 12px;
     font-size: 16px;
     font-weight: 700;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'M PLUS 1p', sans-serif;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(255, 212, 59, 0.3);
+    box-shadow: 0 4px 15px rgba(74, 159, 216, 0.3);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 212, 59, 0.4);
+    box-shadow: 0 8px 25px rgba(74, 159, 216, 0.4);
 }
 
 .btn-primary:active {
@@ -279,7 +277,7 @@ body::before {
     text-align: center;
     margin: 25px 0;
     position: relative;
-    color: #999;
+    color: #adb5bd;
     font-size: 0.9em;
 }
 
@@ -290,7 +288,7 @@ body::before {
     left: 0;
     right: 0;
     height: 1px;
-    background: #e0e0e0;
+    background: #e9ecef;
     z-index: 1;
 }
 
@@ -307,26 +305,27 @@ body::before {
 }
 
 .back-link a {
-    color: #003366;
+    color: #4a9fd8;
     text-decoration: none;
     font-weight: 500;
     font-size: 0.95em;
 }
 
 .back-link a:hover {
-    color: #FFD43B;
+    color: #2c7fb8;
+    text-decoration: underline;
 }
 
-    .token-info {
-        background: #f8f9fa;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 20px;
-        font-size: 0.85em;
-        color: #666;
-        text-align: center;
-    }
+.token-info {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-size: 0.85em;
+    color: #6c757d;
+    text-align: center;
+}
 
 @media (max-width: 768px) {
     .forgot-wrapper {
@@ -361,13 +360,13 @@ body::before {
         gap: 0;
     }
 
-        .token-row {
-            flex-direction: column;
-            gap: 15px;
-        }
+    .token-row {
+        flex-direction: column;
+        gap: 15px;
+    }
 
-        .btn-generate-container {
-            min-width: auto;
-            width: 100%;
-        }
+    .btn-generate-container {
+        min-width: auto;
+        width: 100%;
+    }
 }

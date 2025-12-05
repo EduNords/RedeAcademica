@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Avaliação dos Professores{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/avaliacao_professores.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="topbar">
+  <div>☰</div>
+  <div>🔍 🔔 👤</div>
+</div>
+
+<div class="container">
+
+  <div class="brand">
+    <div>
+      <h1>Avaliação dos Professores</h1>
+      <p>Encontre e avalie os professores da PUC-Rio</p>
+    </div>
+
+    <div class="logo">
+      <div>🎓</div>
+      <div>
+        <div class="title">REDE</div>
+        <div class="sub">ACADÊMICA</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-row">
+
+    <div class="search">
+      <span class="icon">🔎</span>
+      <input placeholder="Digite o nome do professor">
+    </div>
+
+    <form class="search" action="/avaliacao_professores/" method="get">
+      <span class="icon">🔎</span>
+      <input type="text" name="q" placeholder="Procure por nome ou código da disciplina" value="{{ request.GET.q }}">
+    </form>
+
+  </div>
+
+  <div class="card">
+
+    <div class="tabs">
+      <a href="/avaliacao_professores/" class="tab active">
+        Avaliação dos Professores da Disciplina
+      </a>
+
+      <a href="{% url 'avaliacao_disciplina' %}?q={{ disciplina.codigo }}" class="tab">
+          Avaliação da Disciplina
+      </a>
+
+      {% if disciplina %}
+      <a href="{% url 'avalie_disciplina' disciplina.codigo %}" class="avaliar-btn">
+          Avaliar Disciplina
+      </a>
+      {% endif %}
+    </div>
+
+    {% if disciplina %}
+
+    <div class="table">
+
+      <div class="head row">
+        <div class="cell sticky disciplina-title">
+          {{ disciplina.nome }} ({{ disciplina.codigo }})
+        </div>
+
+        {% for p in professores %}
+          <div class="cell prof-title">{{ p.nome }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="row">
+        <div class="cell sticky">Domínio do conteúdo</div>
+        {% for p in professores %}
+          <div class="cell">{{ p.dominio|default:"-"|floatformat:1 }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="row">
+        <div class="cell sticky">Métodos e recursos adotados utilizados</div>
+        {% for p in professores %}
+          <div class="cell">{{ p.metodos|default:"-"|floatformat:1 }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="row">
+        <div class="cell sticky">Relacionamento com os alunos</div>
+        {% for p in professores %}
+          <div class="cell">{{ p.relacionamento|default:"-"|floatformat:1 }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="row">
+        <div class="cell sticky">Compatibilidade entre avaliações e conteúdo</div>
+        {% for p in professores %}
+          <div class="cell">{{ p.compatibilidade|default:"-"|floatformat:1 }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="row">
+        <div class="cell sticky">Clareza na explicação</div>
+        {% for p in professores %}
+          <div class="cell">{{ p.clareza|default:"-"|floatformat:1 }}</div>
+        {% endfor %}
+      </div>
+
+    </div>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+{% endblock %}

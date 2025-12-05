@@ -473,3 +473,47 @@ class CargoRequest(models.Model):
     
     def __str__(self):
         return f"{self.nome} - {self.get_status_display()} ({self.solicitado_por.username})"
+
+class Disciplinas(models.Model):
+    nome = models.CharField(max_length=200)
+    codigo = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.codigo} - {self.nome}"
+
+
+class AvaliacaoDisciplina(models.Model):
+    disciplina = models.ForeignKey(Disciplinas, on_delete=models.CASCADE)
+
+    contribuicao = models.IntegerField()
+    equilibrio = models.IntegerField()
+    aplicacao = models.IntegerField()
+    material = models.IntegerField()
+    distribuicao = models.IntegerField()
+
+    comentario = models.TextField(blank=True, null=True)
+
+    usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Avaliação de {self.disciplina.codigo} por {self.usuario}"
+
+class Professores(models.Model):
+    nome = models.CharField(max_length=100)
+    disciplinas = models.ManyToManyField(Disciplinas, related_name='professores')
+
+    def __str__(self):
+        return self.nome
+
+
+class Avaliacao(models.Model):
+    professor = models.ForeignKey(Professores, on_delete=models.CASCADE)
+    disciplina = models.ForeignKey(Disciplinas, on_delete=models.CASCADE)
+
+    dominio = models.IntegerField(null=True, blank=True)
+    metodos = models.IntegerField(null=True, blank=True)
+    relacionamento = models.IntegerField(null=True, blank=True)
+    compatibilidade = models.IntegerField(null=True, blank=True)
+    clareza = models.IntegerField(null=True, blank=True)
+    comentario = models.TextField(null=True, blank=True)

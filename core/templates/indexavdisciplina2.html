@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tela 4 — Lista + detalhes (ver médias)</title>
+  <link rel="stylesheet" href="{% static 'css/styleavdiscplina2.css' %}">
+</head>
+<body>
+  <div class="topbar"><div>☰</div><div>🔍 🔔 👤</div></div>
+
+  <div class="container">
+    <div class="brand">
+      <div>
+        <h1>Avalie seus Professores</h1>
+        <p>Encontre e avalie os professores da PUC-Rio</p>
+      </div>
+      <div class="logo">
+        <div>🎓</div>
+        <div>
+          <div class="title">REDE</div>
+          <div class="sub">ACADÊMICA</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-row">
+      <div class="search"><span class="icon">🔎</span><input placeholder="Digite o nome do professor"></div>
+      <div class="search"><span class="icon">🔎</span><input placeholder="Procure por nome ou código da disciplina"></div>
+    </div>
+
+    <div class="two">
+      <div class="left card list">
+        <div class="prof">
+          <div class="pic">👤</div>
+          <div>
+            <strong>Nome Professor</strong><div style="color:#6c7d92">Matéria XXX</div>
+            <div class="actions"><button class="btn">Avaliar</button><button class="btn alt">Ver avaliação</button></div>
+          </div>
+        </div>
+        <div class="prof">
+          <div class="pic">👤</div>
+          <div>
+            <strong>Nome Professor</strong><div style="color:#6c7d92">Matéria XXX</div>
+            <div class="actions"><button class="btn">Avaliar</button><button class="btn alt">Ver avaliação</button></div>
+          </div>
+        </div>
+        <div class="prof">
+          <div class="pic">👤</div>
+          <div>
+            <strong>Nome Professor</strong><div style="color:#6c7d92">Matéria XXX</div>
+            <div class="actions"><button class="btn">Avaliar</button><button class="btn alt">Ver avaliação</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right card">
+        <div class="head">
+          <div class="pic">👤</div>
+          <div style="flex:1">
+            <strong>Nome Professor</strong><div style="color:#6c7d92">Matéria XXX</div>
+          </div>
+          <button class="btn">Avalie o professor</button>
+        </div>
+
+        <ul class="rate">
+          <li><span>Domínio do conteúdo</span><strong>8.2 de média</strong><em>110 respondentes</em></li>
+          <li><span>Métodos e recursos adotados utilizados</span><strong>9.0 de média</strong><em>110 respondentes</em></li>
+          <li><span>Relacionamento com os alunos</span><strong>7.5 de média</strong><em>110 respondentes</em></li>
+          <li><span>Compatibilidade entre avaliações e conteúdo das aulas</span><strong>8.0 de média</strong><em>110 respondentes</em></li>
+          <li><span>Clareza na explicação</span><strong>5.0 de média</strong><em>110 respondentes</em></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">Tela 4 — versão simples (HTML/CSS básicos).</div>
+  </div>
+</body>
+</html>

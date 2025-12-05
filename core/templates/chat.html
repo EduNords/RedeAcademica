@@ -1,15 +1,14 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ canal.nome }} - Rede Acadêmica</title>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
-</head>
-<body>
+
+{% block title %}{{ canal.nome }} - Rede Acadêmica{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
     <header class="chat-header">
         <div class="header-left">
             <a href="{% url 'dashboard' %}" class="btn-back">
@@ -119,5 +118,5 @@
             }
         });
     </script>
-</body>
-</html>
+</div>
+{% endblock %}

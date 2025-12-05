@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Rede Acadêmica{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header (clean, minimal) -->
+    <header class="site-header">
+        <a href="{% url 'dashboard' %}" class="logo-link">
+            <div class="logo-simple">REDE ACADÊMICA</div>
+        </a>
+
+        <div class="header-icons">
+            <a href="{% url 'busca_usuarios' %}" class="icon-btn" title="Pesquisar Usuários">
+                <i class="fas fa-search"></i>
+            </a>
+
+            <a href="{% url 'listar_eventos' %}" class="icon-btn" title="Eventos">
+                <i class="fas fa-calendar"></i>
+            </a>
+            
+            {% if user.is_staff %}
+            <a href="{% url 'admin_panel' %}" class="icon-btn" title="Painel Admin">
+                <i class="fas fa-cog"></i>
+            </a>
+            {% endif %}
+
+            <a href="{% url 'perfil' %}" class="user-avatar-btn" title="Meu Perfil">
+                <img src="{{ user.foto_url|default:'https://images.icon-icons.com/2483/PNG/512/user_icon_149851.png' }}" alt="Avatar" class="user-avatar">
+            </a>
+        </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-wrapper">
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                        <button type="button" class="close-msg">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Rede Acadêmica - PUC-Rio. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Close messages
+        document.querySelectorAll('.close-msg').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.parentElement.style.display = 'none';
+            });
+        });
+
+        // (intentionally minimal header behavior; dropdowns handled per-page if needed)
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

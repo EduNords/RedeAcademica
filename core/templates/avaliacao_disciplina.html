@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Avaliação da Disciplina{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/avaliacao_disc.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="topbar">
+  <div>☰</div>
+  <div>🔍 🔔 👤</div>
+</div>
+
+<div class="container">
+
+  <div class="brand">
+    <div>
+      <h1>Avaliação da Disciplina</h1>
+      <p>Veja como os alunos avaliaram esta disciplina</p>
+    </div>
+
+    <div class="logo">
+      <div>🎓</div>
+      <div>
+        <div class="title">REDE</div>
+        <div class="sub">ACADÊMICA</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-row">
+
+    <div class="search">
+      <span class="icon">🔎</span>
+      <input placeholder="Digite o nome do professor">
+    </div>
+
+    <form class="search" method="get">
+      <span class="icon">🔎</span>
+      <input type="text" name="q"
+             placeholder="Procure por nome ou código da disciplina"
+             value="{{ q }}">
+    </form>
+
+  </div>
+
+  <div class="card">
+
+    <div class="tabs">
+
+      <a href="{% url 'avaliacao_professores' %}?q={{ q }}" class="tab">
+        Avaliação dos Professores
+      </a>
+
+      <a href="{% url 'avaliacao_disciplina' %}?q={{ q }}" class="tab active">
+        Avaliação da Disciplina
+      </a>
+
+      {% if disciplina %}
+      <a href="{% url 'avalie_disciplina' disciplina.codigo %}" class="avaliar-btn">
+          Avaliar Disciplina
+      </a>
+      {% endif %}
+    </div>
+
+    {% if disciplina %}
+
+    <!-- TÍTULO CORRIGIDO -->
+    <h2 class="disc-title">
+        {{ disciplina.nome }} ({{ disciplina.codigo }})
+    </h2>
+
+    <div class="grid">
+
+      <div class="item metric">
+        <span>Contribuição para sua formação</span>
+        <strong>{{ medias.contribuicao|floatformat:1|default:"-" }}</strong>
+      </div>
+
+      <div class="item metric">
+        <span>Equilíbrio tarefas × créditos</span>
+        <strong>{{ medias.equilibrio|floatformat:1|default:"-" }}</strong>
+      </div>
+
+      <div class="item metric">
+        <span>Aplicação prática</span>
+        <strong>{{ medias.aplicacao|floatformat:1|default:"-" }}</strong>
+      </div>
+
+      <div class="item metric">
+        <span>Qualidade do material didático</span>
+        <strong>{{ medias.material|floatformat:1|default:"-" }}</strong>
+      </div>
+
+      <div class="item metric">
+        <span>Distribuição das avaliações</span>
+        <strong>{{ medias.distribuicao|floatformat:1|default:"-" }}</strong>
+      </div>
+
+    </div>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+{% endblock %}

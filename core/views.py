@@ -949,8 +949,8 @@ def recusar_cargo_request(request, request_id):
 
 @login_required
 def avaliacao_professores(request):
-    q = request.GET.get("q")
-
+    q = request.GET.get("q", "").strip()  # Adiciona validação
+    
     disciplina = None
     professores_data = []
 
@@ -960,17 +960,38 @@ def avaliacao_professores(request):
         ).first()
 
         if disciplina:
-            professores = Professores.objects.filter(disciplinas=disciplina)
+            # OTIMIZAÇÃO: Uma única query com agregações
+            professores = Professores.objects.filter(
+                disciplinas=disciplina
+            ).annotate(
+                avg_dominio=Avg('avaliacao__dominio', 
+                               filter=Q(avaliacao__disciplina=disciplina)),
+                avg_metodos=Avg('avaliacao__metodos', 
+                               filter=Q(avaliacao__disciplina=disciplina)),
+                avg_relacionamento=Avg('avaliacao__relacionamento', 
+                                      filter=Q(avaliacao__disciplina=disciplina)),
+                avg_compatibilidade=Avg('avaliacao__compatibilidade', 
+                                       filter=Q(avaliacao__disciplina=disciplina)),
+                avg_clareza=Avg('avaliacao__clareza', 
+                               filter=Q(avaliacao__disciplina=disciplina)),
+            ).values(
+                'nome', 
+                'avg_dominio', 
+                'avg_metodos', 
+                'avg_relacionamento', 
+                'avg_compatibilidade', 
+                'avg_clareza'
+            )
 
+            # Formata os dados
             for prof in professores:
-                avaliacoes = Avaliacao.objects.filter(professor=prof, disciplina=disciplina)
                 professores_data.append({
-                    "nome": prof.nome,
-                    "dominio": avaliacoes.aggregate(avg=Avg("dominio"))["avg"] or 0,
-                    "metodos": avaliacoes.aggregate(avg=Avg("metodos"))["avg"] or 0,
-                    "relacionamento": avaliacoes.aggregate(avg=Avg("relacionamento"))["avg"] or 0,
-                    "compatibilidade": avaliacoes.aggregate(avg=Avg("compatibilidade"))["avg"] or 0,
-                    "clareza": avaliacoes.aggregate(avg=Avg("clareza"))["avg"] or 0,
+                    "nome": prof['nome'],
+                    "dominio": round(prof['avg_dominio'] or 0, 2),
+                    "metodos": round(prof['avg_metodos'] or 0, 2),
+                    "relacionamento": round(prof['avg_relacionamento'] or 0, 2),
+                    "compatibilidade": round(prof['avg_compatibilidade'] or 0, 2),
+                    "clareza": round(prof['avg_clareza'] or 0, 2),
                 })
 
     return render(request, "avaliacao_professores.html", {
@@ -979,9 +1000,11 @@ def avaliacao_professores(request):
         "q": q,
     })
 
+
 @login_required
 def avaliacao_disciplina(request):
-    q = request.GET.get("q")
+    q = request.GET.get("q", "").strip()  # Adiciona validação
+    
     disciplina = None
     medias = {}
 
@@ -991,13 +1014,23 @@ def avaliacao_disciplina(request):
         ).first()
 
         if disciplina:
-            avaliacoes = AvaliacaoDisciplina.objects.filter(disciplina=disciplina)
+            # OTIMIZAÇÃO: Uma única query com todas as agregações
+            avaliacoes = AvaliacaoDisciplina.objects.filter(
+                disciplina=disciplina
+            ).aggregate(
+                avg_contribuicao=Avg("contribuicao"),
+                avg_equilibrio=Avg("equilibrio"),
+                avg_aplicacao=Avg("aplicacao"),
+                avg_material=Avg("material"),
+                avg_distribuicao=Avg("distribuicao"),
+            )
+            
             medias = {
-                "contribuicao": avaliacoes.aggregate(Avg("contribuicao"))["contribuicao__avg"] or 0,
-                "equilibrio": avaliacoes.aggregate(Avg("equilibrio"))["equilibrio__avg"] or 0,
-                "aplicacao": avaliacoes.aggregate(Avg("aplicacao"))["aplicacao__avg"] or 0,
-                "material": avaliacoes.aggregate(Avg("material"))["material__avg"] or 0,
-                "distribuicao": avaliacoes.aggregate(Avg("distribuicao"))["distribuicao__avg"] or 0,
+                "contribuicao": round(avaliacoes["avg_contribuicao"] or 0, 2),
+                "equilibrio": round(avaliacoes["avg_equilibrio"] or 0, 2),
+                "aplicacao": round(avaliacoes["avg_aplicacao"] or 0, 2),
+                "material": round(avaliacoes["avg_material"] or 0, 2),
+                "distribuicao": round(avaliacoes["avg_distribuicao"] or 0, 2),
             }
 
     return render(request, "avaliacao_disciplina.html", {

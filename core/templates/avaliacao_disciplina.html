@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Avaliação da Disciplina{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/avaliacao_disc.css' %}?v=2.0">
+{% endblock %}
+
+{% block content %}
+
+<div class="avaliacao-container">
+  
+  <!-- Page Header Section -->
+  <div class="page-header-section">
+    <div class="header-content">
+      <div class="header-text">
+        <h1><i class="fas fa-book-reader"></i> Avaliação da Disciplina</h1>
+        <p>Veja como os alunos avaliaram esta disciplina</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <form class="search-form" method="get" action="{% url 'avaliacao_disciplina' %}">
+      <div class="search-header">
+        <i class="fas fa-search-location search-header-icon"></i>
+        <div class="search-header-text">
+          <h3>Encontre uma Disciplina</h3>
+          <p>Pesquise por nome, código ou palavras-chave</p>
+        </div>
+      </div>
+      
+      <div class="search-wrapper">
+        <div class="search-input-container">
+          <i class="fas fa-book search-icon"></i>
+          <input 
+            type="text" 
+            name="q"
+            placeholder="Ex: Cálculo I, MAT001, Algoritmos..."
+            value="{{ q|default:'' }}"
+            class="search-input"
+            autocomplete="off"
+          >
+          {% if q %}
+          <button type="button" class="clear-btn" onclick="this.form.reset(); this.closest('form').submit();">
+            <i class="fas fa-times"></i>
+          </button>
+          {% endif %}
+        </div>
+        
+        <button type="submit" class="search-btn">
+          <i class="fas fa-search"></i>
+          <span>Buscar</span>
+        </button>
+      </div>
+
+      <div class="search-tips">
+        <span class="tip-label"><i class="fas fa-lightbulb"></i> Dicas:</span>
+        <div class="tips-list">
+          <span class="tip-item">Use o código completo</span>
+          <span class="tip-item">Tente palavras-chave</span>
+          <span class="tip-item">Verifique a ortografia</span>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Main Card -->
+  <div class="main-card">
+    
+    <!-- Navigation Tabs -->
+    <div class="tabs-container">
+      <div class="tabs">
+        <a href="{% url 'avaliacao_professores' %}{% if q %}?q={{ q }}{% endif %}" class="tab">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span>Avaliação dos Professores</span>
+        </a>
+
+        <a href="{% url 'avaliacao_disciplina' %}{% if q %}?q={{ q }}{% endif %}" class="tab active">
+          <i class="fas fa-book"></i>
+          <span>Avaliação da Disciplina</span>
+        </a>
+
+        {% if disciplina %}
+        <a href="{% url 'avalie_disciplina' disciplina.codigo %}" class="avaliar-btn">
+          <i class="fas fa-star"></i>
+          <span>Avaliar Disciplina</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if disciplina %}
+
+    <!-- Disciplina Title -->
+    <div class="disciplina-header">
+      <div class="disciplina-icon">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <div class="disciplina-info">
+        <h2 class="disciplina-nome">{{ disciplina.nome }}</h2>
+        <p class="disciplina-codigo">Código: {{ disciplina.codigo }}</p>
+      </div>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="metrics-grid">
+      
+      <div class="metric-card">
+        <div class="metric-icon contribuicao-icon">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">Contribuição para sua formação</span>
+          <div class="metric-value">
+            <strong>{{ medias.contribuicao|floatformat:1|default:"—" }}</strong>
+            <span class="metric-max">/ 10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon equilibrio-icon">
+          <i class="fas fa-balance-scale"></i>
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">Equilíbrio tarefas × créditos</span>
+          <div class="metric-value">
+            <strong>{{ medias.equilibrio|floatformat:1|default:"—" }}</strong>
+            <span class="metric-max">/ 10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon aplicacao-icon">
+          <i class="fas fa-tools"></i>
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">Aplicação prática</span>
+          <div class="metric-value">
+            <strong>{{ medias.aplicacao|floatformat:1|default:"—" }}</strong>
+            <span class="metric-max">/ 10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon material-icon">
+          <i class="fas fa-book-open"></i>
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">Qualidade do material didático</span>
+          <div class="metric-value">
+            <strong>{{ medias.material|floatformat:1|default:"—" }}</strong>
+            <span class="metric-max">/ 10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon distribuicao-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">Distribuição das avaliações</span>
+          <div class="metric-value">
+            <strong>{{ medias.distribuicao|floatformat:1|default:"—" }}</strong>
+            <span class="metric-max">/ 10</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    {% else %}
+
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h3>Nenhuma disciplina encontrada</h3>
+      <p>Digite o nome ou código da disciplina na busca acima para ver as avaliações</p>
+    </div>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+{% endblock %}

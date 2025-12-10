@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Avaliar Disciplina{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/avalie.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="avaliacao-container">
+  
+  <!-- Page Header -->
+  <div class="page-header-section">
+    <div class="header-content">
+      <div class="header-text">
+        <h1><i class="fas fa-star"></i> Avaliar Disciplina</h1>
+        <p>Envie sua avaliação para ajudar outros alunos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <form class="search-form" method="get">
+      <div class="search-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input 
+          type="text" 
+          name="q" 
+          placeholder="Digite o código da disciplina" 
+          value="{{ q }}"
+          class="search-input"
+        >
+        <button type="submit" class="search-btn">
+          <i class="fas fa-search"></i> Buscar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Main Card -->
+  <div class="main-card">
+    
+    <!-- Navigation Tabs -->
+    <div class="tabs-container">
+      <div class="tabs">
+        <a href="{% url 'avaliacao_professores' %}?q={{ q }}" class="tab">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span>Avaliação dos Professores</span>
+        </a>
+
+        <a href="{% url 'avaliacao_disciplina' %}?q={{ q }}" class="tab">
+          <i class="fas fa-book"></i>
+          <span>Avaliação da Disciplina</span>
+        </a>
+
+        {% if disciplina %}
+        <a href="{% url 'avalie_disciplina' disciplina.codigo %}" class="avaliar-btn active">
+          <i class="fas fa-star"></i>
+          <span>Avaliar Disciplina</span>
+        </a>
+        {% else %}
+        <a href="#" class="avaliar-btn active" onclick="return false;">
+          <i class="fas fa-star"></i>
+          <span>Avaliar Disciplina</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if disciplina %}
+
+    <!-- Disciplina Header -->
+    <div class="disciplina-header">
+      <div class="disciplina-icon">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <div class="disciplina-info">
+        <h2 class="disciplina-nome">{{ disciplina.nome }}</h2>
+        <p class="disciplina-codigo">{{ disciplina.codigo }}</p>
+      </div>
+    </div>
+
+    <!-- Formulário -->
+    <form method="POST" class="avaliacao-form">
+      {% csrf_token %}
+      <input type="hidden" name="disciplina_id" value="{{ disciplina.id }}">
+
+      <!-- Grid de Avaliação -->
+      <div class="grid-avaliacao">
+
+        <div class="form-item">
+          <div class="form-item-header">
+            <i class="fas fa-lightbulb"></i>
+            <label>Contribuição da disciplina à sua formação</label>
+          </div>
+          <div class="input-wrapper">
+            <input 
+              class="nota-input" 
+              type="number" 
+              name="contribuicao" 
+              min="0" 
+              max="10" 
+              step="0.1"
+              placeholder="0-10"
+              required
+            >
+            <span class="input-hint">/ 10</span>
+          </div>
+        </div>
+
+        <div class="form-item">
+          <div class="form-item-header">
+            <i class="fas fa-balance-scale"></i>
+            <label>Equilíbrio entre carga de tarefa e número de créditos</label>
+          </div>
+          <div class="input-wrapper">
+            <input 
+              class="nota-input" 
+              type="number" 
+              name="equilibrio" 
+              min="0" 
+              max="10" 
+              step="0.1"
+              placeholder="0-10"
+              required
+            >
+            <span class="input-hint">/ 10</span>
+          </div>
+        </div>
+
+        <div class="form-item">
+          <div class="form-item-header">
+            <i class="fas fa-tools"></i>
+            <label>Aplicação prática do conteúdo</label>
+          </div>
+          <div class="input-wrapper">
+            <input 
+              class="nota-input" 
+              type="number" 
+              name="aplicacao" 
+              min="0" 
+              max="10" 
+              step="0.1"
+              placeholder="0-10"
+              required
+            >
+            <span class="input-hint">/ 10</span>
+          </div>
+        </div>
+
+        <div class="form-item">
+          <div class="form-item-header">
+            <i class="fas fa-book"></i>
+            <label>Qualidade do material didático</label>
+          </div>
+          <div class="input-wrapper">
+            <input 
+              class="nota-input" 
+              type="number" 
+              name="material" 
+              min="0" 
+              max="10" 
+              step="0.1"
+              placeholder="0-10"
+              required
+            >
+            <span class="input-hint">/ 10</span>
+          </div>
+        </div>
+
+        <div class="form-item">
+          <div class="form-item-header">
+            <i class="fas fa-calendar-check"></i>
+            <label>Distribuição das avaliações</label>
+          </div>
+          <div class="input-wrapper">
+            <input 
+              class="nota-input" 
+              type="number" 
+              name="distribuicao" 
+              min="0" 
+              max="10" 
+              step="0.1"
+              placeholder="0-10"
+              required
+            >
+            <span class="input-hint">/ 10</span>
+          </div>
+        </div>
+
+        <!-- Comentário -->
+        <div class="form-item-full">
+          <div class="form-item-header">
+            <i class="fas fa-comment-alt"></i>
+            <label>Comentário (opcional)</label>
+          </div>
+          <textarea 
+            class="comentario-input" 
+            name="comentario"
+            placeholder="Compartilhe sua experiência com esta disciplina..."
+            rows="5"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <!-- Botão Enviar -->
+      <div class="form-actions">
+        <button type="submit" class="avaliar-submit">
+          <i class="fas fa-paper-plane"></i>
+          <span>Enviar Avaliação</span>
+        </button>
+      </div>
+
+    </form>
+
+    {% else %}
+
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h3>Disciplina não encontrada</h3>
+      <p>Digite o código da disciplina na busca acima para começar a avaliar</p>
+    </div>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+{% endblock %}

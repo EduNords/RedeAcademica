@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConectPuc - Networking Acadêmico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Lato:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="welcome-section">
+            <div class="brand-logo">Rede Acadêmica</div>
+            <h1 class="welcome-title">Conecte-se com a comunidade acadêmica</h1>
+            <p class="welcome-description">
+                A plataforma que conecta estudantes, facilita networking e impulsiona colaborações acadêmicas entre os alunos da PUC.
+            </p>
+
+            <ul class="features-list">
+                <li>Encontre colegas do seu curso e área</li>
+                <li>Participe de grupos de estudo</li>
+                <li>Compartilhe projetos e experiências</li>
+                <li>Descubra oportunidades acadêmicas</li>
+            </ul>
+
+            <div class="stats-card">
+                <div class="stats-number">500+</div>
+                <div class="stats-label">Estudantes conectados</div>
+            </div>
+        </div>
+
+        <div class="login-section">
+            <div class="login-header">
+                <h2 class="login-title">Bem-vindo!</h2>
+                <p class="login-subtitle">Faça login para acessar sua conta</p>
+            </div>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" name="username" placeholder="Digite seu nome de usuário" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
+                </div>
+
+                <div class="login-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Manter conectado</label>
+                    </div>
+                    <a href="{% url 'esqueci_senha' %}" class="forgot-password">Esqueci a senha</a>
+                </div>
+
+                <button type="submit" class="btn-primary">Entrar na Rede Acadêmica</button>
+            </form>
+
+            <div class="divider">
+                <span>Novo por aqui?</span>
+            </div>
+
+            <a href="{% url 'registro' %}" class="btn-secondary" style="text-decoration: none; display: block; text-align: center;">Criar Conta</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Avaliação dos Professores{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/avaliacao_professores.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="avaliacao-container">
+  
+  <!-- Page Header -->
+  <div class="page-header-section">
+    <div class="header-content">
+      <div class="header-text">
+        <h1><i class="fas fa-chalkboard-teacher"></i> Avaliação dos Professores</h1>
+        <p>Encontre e avalie os professores da PUC-Rio</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <form class="search-form" method="get" action="{% url 'avaliacao_professores' %}">
+      <div class="search-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input 
+          type="text" 
+          name="q" 
+          placeholder="Procure por nome ou código da disciplina" 
+          value="{{ q }}"
+          class="search-input"
+        >
+        <button type="submit" class="search-btn">
+          <i class="fas fa-search"></i> Buscar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Main Card -->
+  <div class="main-card">
+    
+    <!-- Navigation Tabs -->
+    <div class="tabs-container">
+      <div class="tabs">
+        <a href="{% url 'avaliacao_professores' %}?q={{ q }}" class="tab active">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span>Avaliação dos Professores</span>
+        </a>
+
+        <a href="{% url 'avaliacao_disciplina' %}?q={{ q }}" class="tab">
+          <i class="fas fa-book"></i>
+          <span>Avaliação da Disciplina</span>
+        </a>
+
+        {% if disciplina %}
+        <a href="{% url 'avalie_disciplina' disciplina.codigo %}" class="avaliar-btn">
+          <i class="fas fa-star"></i>
+          <span>Avaliar Disciplina</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if disciplina %}
+
+    <!-- Disciplina Header -->
+    <div class="disciplina-header">
+      <div class="disciplina-icon">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <div class="disciplina-info">
+        <h2 class="disciplina-nome">{{ disciplina.nome }}</h2>
+        <p class="disciplina-codigo">{{ disciplina.codigo }}</p>
+      </div>
+    </div>
+
+    <!-- Professors Table -->
+    {% if professores %}
+    <div class="table-container">
+      <div class="table-wrapper">
+        <table class="professors-table">
+          <thead>
+            <tr>
+              <th class="sticky-header">
+                <i class="fas fa-list"></i> Critérios
+              </th>
+              {% for p in professores %}
+              <th>
+                <div class="prof-header">
+                  <i class="fas fa-user-tie"></i>
+                  <span>{{ p.nome }}</span>
+                </div>
+              </th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="sticky-cell">
+                <i class="fas fa-brain"></i> Domínio do conteúdo
+              </td>
+              {% for p in professores %}
+              <td>
+                <div class="rating-badge">
+                  {{ p.dominio|default:"-"|floatformat:1 }}
+                </div>
+              </td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td class="sticky-cell">
+                <i class="fas fa-chalkboard"></i> Métodos e recursos adotados
+              </td>
+              {% for p in professores %}
+              <td>
+                <div class="rating-badge">
+                  {{ p.metodos|default:"-"|floatformat:1 }}
+                </div>
+              </td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td class="sticky-cell">
+                <i class="fas fa-users"></i> Relacionamento com os alunos
+              </td>
+              {% for p in professores %}
+              <td>
+                <div class="rating-badge">
+                  {{ p.relacionamento|default:"-"|floatformat:1 }}
+                </div>
+              </td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td class="sticky-cell">
+                <i class="fas fa-check-circle"></i> Compatibilidade entre avaliações e conteúdo
+              </td>
+              {% for p in professores %}
+              <td>
+                <div class="rating-badge">
+                  {{ p.compatibilidade|default:"-"|floatformat:1 }}
+                </div>
+              </td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td class="sticky-cell">
+                <i class="fas fa-comments"></i> Clareza na explicação
+              </td>
+              {% for p in professores %}
+              <td>
+                <div class="rating-badge">
+                  {{ p.clareza|default:"-"|floatformat:1 }}
+                </div>
+              </td>
+              {% endfor %}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-user-slash"></i>
+      </div>
+      <h3>Nenhum professor encontrado</h3>
+      <p>Esta disciplina não possui professores cadastrados ou avaliados ainda</p>
+    </div>
+    {% endif %}
+
+    {% else %}
+
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h3>Nenhuma disciplina encontrada</h3>
+      <p>Digite o nome ou código da disciplina na busca acima para ver as avaliações dos professores</p>
+    </div>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+{% endblock %}

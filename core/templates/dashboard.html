@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rede Acadêmica - Dashboard{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <div class="welcome">Bem-vindo(a), {{ user.fullname|default:user.username }}</div>
+                <div class="welcome-subtitle">{{ data_formatada }}</div>
+            </div>
+            
+            <div class="logo-section">
+                <div class="logo-icon">∞</div>
+                <div class="logo-text-container">
+                    <div class="logo-text">REDE</div>
+                    <div class="logo-subtitle">ACADÊMICA</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Quick Actions Section -->
+            <div class="section quick-actions-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-bolt"></i>
+                        Ações Rápidas
+                    </h2>
+                </div>
+                <div class="quick-actions-grid">
+                    <a href="{% url 'criar_canal' %}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <span class="quick-action-label">Novo Canal</span>
+                    </a>
+                    <a href="{% url 'busca_usuarios' %}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <span class="quick-action-label">Buscar Usuários</span>
+                    </a>
+                    <a href="{% url 'avaliacao_disciplina' %}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="quick-action-label">Avaliar Disciplinas</span>
+                    </a>
+                    <a href="{% url 'avaliacao_professores' %}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-chalkboard-user"></i>
+                        </div>
+                        <span class="quick-action-label">Avaliar Professores</span>
+                    </a>
+                    <a href="{% url 'listar_eventos' %}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <span class="quick-action-label">Criar Evento</span>
+                    </a>
+                    <a href="{% url 'perfil' %}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <span class="quick-action-label">Meu Perfil</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Canais Disponíveis Section -->
+            <div class="section canais-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-comments"></i>
+                        Seus Canais
+                    </h2>
+                    <button class="btn-novo-canal">
+                        <i class="fas fa-plus"></i>
+                        Novo Canal
+                    </button>
+                </div>
+
+                {% if canais_disponiveis %}
+                    <div class="canais-grid">
+                        {% for canal in canais_disponiveis %}
+                        <a href="{% url 'chat' canal.id %}" class="canal-card">
+                            <div class="canal-header">
+                                <div class="canal-info">
+                                    <i class="fas {% if canal.tipo == 'publico' %}fa-globe{% elif canal.tipo == 'privado' %}fa-lock{% else %}fa-shield-alt{% endif %} canal-icon"></i>
+                                    <div>
+                                        <h3 class="canal-nome">{{ canal.nome }}</h3>
+                                        <p class="canal-tipo">{{ canal.get_tipo_display }}</p>
+                                    </div>
+                                </div>
+                                {% if canal.mensagens_nao_lidas > 0 %}
+                                    <span class="mensagens-badge">{{ canal.mensagens_nao_lidas }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if canal.descricao %}
+                                <p class="canal-descricao">{{ canal.descricao|truncatewords:15 }}</p>
+                            {% endif %}
+
+                            {% if canal.tipo == 'restrito' and canal.cargos_permitidos.all %}
+                                <div class="canal-cargos">
+                                    {% for cargo in canal.cargos_permitidos.all|slice:":3" %}
+                                        <span class="cargo-badge" style="background-color: {{ cargo.cor }}20; color: {{ cargo.cor }}; border-color: {{ cargo.cor }};">
+                                            {{ cargo.nome }}
+                                        </span>
+                                    {% endfor %}
+                                    {% if canal.cargos_permitidos.all|length > 3 %}
+                                        <span class="cargo-badge-more">+{{ canal.cargos_permitidos.all|length|add:"-3" }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            <div class="canal-footer">
+                                <span class="canal-membros">
+                                    <i class="fas fa-users"></i>
+                                    {{ canal.membros.count }} membro{{ canal.membros.count|pluralize }}
+                                </span>
+                                {% if canal.ultima_mensagem %}
+                                    <span class="canal-ultima-msg">
+                                        <i class="far fa-clock"></i>
+                                        {{ canal.ultima_mensagem.created_at|timesince }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-comments-slash"></i>
+                        <p>Você ainda não tem acesso a nenhum canal.</p>
+                        <p class="empty-state-hint">Configure seus cargos no perfil ou crie um novo canal!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Meus Cargos Section -->
+            <div class="section cargos-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-id-badge"></i>
+                        Meus Cargos
+                    </h2>
+                    <a href="{% url 'perfil' %}" class="btn-editar-cargos">
+                        <i class="fas fa-edit"></i>
+                        Gerenciar
+                    </a>
+                </div>
+
+                {% if meus_cargos %}
+                    <div class="cargos-list">
+                        {% for usuario_cargo in meus_cargos %}
+                            <div class="cargo-item" style="border-left-color: {{ usuario_cargo.cargo.cor }};">
+                                <div class="cargo-color" style="background-color: {{ usuario_cargo.cargo.cor }};"></div>
+                                <div class="cargo-info">
+                                    <span class="cargo-nome">{{ usuario_cargo.cargo.nome }}</span>
+                                    {% if usuario_cargo.cargo.descricao %}
+                                        <span class="cargo-desc">{{ usuario_cargo.cargo.descricao|truncatewords:10 }}</span>
+                                    {% endif %}
+                                </div>
+                                <span class="cargo-data">
+                                    <i class="far fa-calendar"></i>
+                                    {{ usuario_cargo.atribuido_em|date:"d/m/Y" }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state-small">
+                        <i class="fas fa-user-tag"></i>
+                        <p>Você ainda não possui cargos.</p>
+                        <a href="{% url 'perfil' %}" class="btn-link">Adicionar cargos</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Events Section -->
+            <div class="section events-section">
+                <div class="events-header">
+                    <div class="events-title">
+                        <i class="fas fa-calendar-day"></i>
+                        <span id="events-date">{{ data_eventos }}</span>
+                    </div>
+                    <div class="events-actions">
+                        <button class="btn-open-calendar" onclick="openCalendarModal()" title="Ver Calendário">
+                            <i class="fas fa-calendar-alt"></i>
+                            Calendário
+                        </button>
+                        <a href="{% url 'criar_evento' %}?data={{ calendario.ano_atual }}-{{ calendario.mes_atual|stringformat:"02d" }}-{{ calendario.dia_selecionado|default:calendario.dia_atual|stringformat:"02d" }}" class="btn-criar-evento">
+                            <i class="fas fa-plus"></i>
+                            Novo Evento
+                        </a>
+                    </div>
+                </div>
+                <div id="events-list">
+                    {% if eventos %}
+                        {% for evento in eventos %}
+                        <div class="event-item {{ evento.cor }}">
+                            <div class="event-time-marker {{ evento.cor }}"></div>
+                            <div class="event-details">
+                                <h4>{{ evento.titulo }}</h4>
+                                <div class="event-time">
+                                    <i class="far fa-clock"></i>
+                                    {{ evento.horario }}
+                                </div>
+                                {% if evento.descricao %}
+                                    <p class="event-description">{{ evento.descricao|truncatewords:20 }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="event-actions">
+                                <a href="{% url 'editar_evento' evento.id %}" class="btn-edit-event" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{% url 'excluir_evento' evento.id %}" method="post" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este evento?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-delete-event" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state-small">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>Nenhum evento para este dia.</p>
+                            <a href="{% url 'criar_evento' %}?data={{ calendario.ano_atual }}-{{ calendario.mes_atual|stringformat:"02d" }}-{{ calendario.dia_selecionado|default:calendario.dia_atual|stringformat:"02d" }}" class="btn-link">Criar evento</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div class="calendar-modal-overlay" id="calendarModal">
+        <div class="calendar-modal-content">
+            <div class="calendar-modal-header">
+                <h2 class="calendar-modal-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    Calendário
+                </h2>
+                <button class="calendar-modal-close" onclick="closeCalendarModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="calendar-modal-body">
+                <div class="section calendar-section-modal">
+                    <div class="calendar-header">
+                        <h3 class="calendar-month">{{ calendario.mes }}</h3>
+                        <div class="calendar-nav">
+                            <button class="nav-btn" id="prev-month-modal"><i class="fas fa-chevron-left"></i></button>
+                            <button class="nav-btn" id="next-month-modal"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid">
+                        <div class="weekdays">
+                            {% for dia in calendario.dias_semana %}
+                            <div class="weekday">{{ dia }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="days">
+                            {% for dia in calendario.dias %}
+                                {% if dia %}
+                                    <div class="day 
+                                        {% if dia == calendario.dia_atual %}today{% endif %} 
+                                        {% if dia == calendario.dia_selecionado %}selected{% endif %}
+                                        {% for dia_evento, eventos_list in calendario.eventos_por_dia.items %}
+                                            {% if dia_evento == dia %}has-events{% endif %}
+                                        {% endfor %}"
+                                        data-day="{{ dia }}"
+                                        data-date="{{ calendario.ano_atual }}-{{ calendario.mes_atual|stringformat:"02d" }}-{{ dia|stringformat:"02d" }}">
+                                        <span class="day-number">{{ dia }}</span>
+                                        {% for dia_evento, eventos_list in calendario.eventos_por_dia.items %}
+                                            {% if dia_evento == dia %}
+                                                <div class="event-dots">
+                                                    {% for evento in eventos_list|slice:":3" %}
+                                                        <span class="event-dot" style="background-color: var(--color-{{ evento.cor }})"></span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="day"></div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+
+    <script>
+        // Adiciona interatividade aos cards de canal
+        document.querySelectorAll('.canal-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Botão de novo canal
+        document.querySelector('.btn-novo-canal')?.addEventListener('click', function() {
+            window.location.href = "{% url 'criar_canal' %}";
+        });
+
+        // Calendar Modal Functions
+        function openCalendarModal() {
+            document.getElementById('calendarModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCalendarModal() {
+            document.getElementById('calendarModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Fechar modal ao clicar fora
+        document.getElementById('calendarModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCalendarModal();
+            }
+        });
+
+        // Calendário interativo no modal
+        document.querySelectorAll('#calendarModal .day[data-date]').forEach(day => {
+            day.addEventListener('click', function() {
+                const date = this.getAttribute('data-date');
+                if (date) {
+                    window.location.href = `{% url 'dashboard' %}?dia=${date}`;
+                }
+            });
+            day.style.cursor = 'pointer';
+        });
+
+        // Navegação do calendário no modal (próximo/mês anterior)
+        document.getElementById('prev-month-modal')?.addEventListener('click', function() {
+            const currentMonth = {{ calendario.mes_atual }};
+            const currentYear = {{ calendario.ano_atual }};
+            let newMonth = currentMonth - 1;
+            let newYear = currentYear;
+            if (newMonth < 1) {
+                newMonth = 12;
+                newYear--;
+            }
+            window.location.href = `{% url 'dashboard' %}?mes=${newYear}-${String(newMonth).padStart(2, '0')}`;
+        });
+
+        document.getElementById('next-month-modal')?.addEventListener('click', function() {
+            const currentMonth = {{ calendario.mes_atual }};
+            const currentYear = {{ calendario.ano_atual }};
+            let newMonth = currentMonth + 1;
+            let newYear = currentYear;
+            if (newMonth > 12) {
+                newMonth = 1;
+                newYear++;
+            }
+            window.location.href = `{% url 'dashboard' %}?mes=${newYear}-${String(newMonth).padStart(2, '0')}`;
+        });
+    </script>
+{% endblock %}

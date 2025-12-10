@@ -1,0 +1,332 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Administração - Rede Acadêmica</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}">
+</head>
+<body>
+    <header>
+        <a href="{% url 'dashboard' %}" class="logo-link">
+            <div class="logo-container">
+                <div class="logo-icon">∞</div>
+                <div class="logo-text-container">
+                    <div class="logo-text">REDE</div>
+                    <div class="logo-subtitle">ACADÊMICA</div>
+                </div>
+            </div>
+        </a>
+        <div class="header-icons">
+            <a href="{% url 'dashboard' %}" class="icon-btn" title="Voltar ao Dashboard">
+                <i class="fas fa-home"></i>
+            </a>
+            <div class="user-avatar-btn">
+                <img src="{{ user.foto_url|default:'/static/images/default-avatar.png' }}" alt="Avatar de {{ user.fullname }}">
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="admin-header">
+            <h1><i class="fas fa-shield-alt"></i> Painel de Administração</h1>
+            <p>Gerencie usuários, chats, cargos e solicitações de chat</p>
+        </div>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Estatísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ total_usuarios }}</div>
+                    <div class="stat-label">Usuários</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ total_canais }}</div>
+                    <div class="stat-label">Canais</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fas fa-id-badge"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ total_cargos }}</div>
+                    <div class="stat-label">Cargos</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ total_chat_requests|add:total_cargo_requests }}</div>
+                    <div class="stat-label">Solicitações Pendentes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Requests -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-inbox"></i> Solicitações de Chat Pendentes</h2>
+            </div>
+            {% if chat_requests %}
+                <div class="chat-requests-list">
+                    {% for request in chat_requests %}
+                    <div class="chat-request-card">
+                        <div class="request-header">
+                            <div class="request-info">
+                                <h3>{{ request.avatar }} {{ request.nome }}</h3>
+                                <p class="request-meta">
+                                    <i class="fas fa-user"></i> Solicitado por: <strong>{{ request.solicitado_por.fullname|default:request.solicitado_por.username }}</strong>
+                                    <span class="separator">•</span>
+                                    <i class="far fa-clock"></i> {{ request.created_at|date:"d/m/Y H:i" }}
+                                </p>
+                            </div>
+                            <span class="status-badge pendente">Pendente</span>
+                        </div>
+                        {% if request.descricao %}
+                            <p class="request-desc">{{ request.descricao }}</p>
+                        {% endif %}
+                        <div class="request-details">
+                            <span class="detail-item">
+                                <i class="fas fa-shield-alt"></i> Tipo: {{ request.get_tipo_display }}
+                            </span>
+                            {% if request.cargos_permitidos.all %}
+                                <span class="detail-item">
+                                    <i class="fas fa-users-cog"></i> Cargos: 
+                                    {% for cargo in request.cargos_permitidos.all %}
+                                        <span class="cargo-tag" style="background-color: {{ cargo.cor }}20; color: {{ cargo.cor }};">{{ cargo.nome }}</span>
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="request-actions">
+                            <a href="{% url 'aceitar_chat_request' request.id %}" class="btn-accept">
+                                <i class="fas fa-check"></i> Aceitar
+                            </a>
+                            <a href="{% url 'recusar_chat_request' request.id %}" class="btn-reject">
+                                <i class="fas fa-times"></i> Recusar
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>Nenhuma solicitação pendente</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Cargo Requests -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-id-badge"></i> Solicitações de Cargo Pendentes</h2>
+            </div>
+            {% if cargo_requests %}
+                <div class="chat-requests-list">
+                    {% for request in cargo_requests %}
+                    <div class="chat-request-card">
+                        <div class="request-header">
+                            <div class="request-info">
+                                <h3>{{ request.nome }}</h3>
+                                <p class="request-meta">
+                                    <i class="fas fa-user"></i> Solicitado por: <strong>{{ request.solicitado_por.fullname|default:request.solicitado_por.username }}</strong>
+                                    <span class="separator">•</span>
+                                    <i class="far fa-clock"></i> {{ request.created_at|date:"d/m/Y H:i" }}
+                                </p>
+                            </div>
+                            <span class="status-badge pendente">Pendente</span>
+                        </div>
+                        {% if request.descricao %}
+                            <p class="request-desc">{{ request.descricao }}</p>
+                        {% endif %}
+                        <div class="request-details">
+                            <span class="detail-item">
+                                <i class="fas fa-palette"></i> Cor: 
+                                <span class="color-badge" style="background-color: {{ request.cor }}; display: inline-block; width: 20px; height: 20px; border-radius: 4px; border: 1px solid #dee2e6; margin-left: 4px;"></span>
+                                {{ request.cor }}
+                            </span>
+                        </div>
+                        <div class="request-actions">
+                            <a href="{% url 'aceitar_cargo_request' request.id %}" class="btn-accept">
+                                <i class="fas fa-check"></i> Aceitar
+                            </a>
+                            <a href="{% url 'recusar_cargo_request' request.id %}" class="btn-reject">
+                                <i class="fas fa-times"></i> Recusar
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>Nenhuma solicitação de cargo pendente</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Usuários -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-users"></i> Usuários</h2>
+            </div>
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Matrícula</th>
+                            <th>Staff</th>
+                            <th>Criado em</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios %}
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <img src="{{ usuario.foto_url|default:'/static/images/default-avatar.png' }}" alt="{{ usuario.username }}" class="user-avatar-small">
+                                    <span>{{ usuario.fullname|default:usuario.username }}</span>
+                                </div>
+                            </td>
+                            <td>{{ usuario.email }}</td>
+                            <td>{{ usuario.matricula }}</td>
+                            <td>
+                                {% if usuario.is_staff %}
+                                    <span class="badge badge-success">Sim</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">Não</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ usuario.created_at|date:"d/m/Y" }}</td>
+                            <td>
+                                <a href="{% url 'deletar_usuario' usuario.id %}" class="btn-delete" onclick="return confirm('Tem certeza que deseja deletar este usuário?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Canais -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-comments"></i> Canais</h2>
+            </div>
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Criado por</th>
+                            <th>Membros</th>
+                            <th>Status</th>
+                            <th>Criado em</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for canal in canais %}
+                        <tr>
+                            <td>
+                                <div class="canal-cell">
+                                    <span class="canal-avatar">{{ canal.avatar }}</span>
+                                    <span>{{ canal.nome }}</span>
+                                </div>
+                            </td>
+                            <td>{{ canal.get_tipo_display }}</td>
+                            <td>{{ canal.criado_por.fullname|default:canal.criado_por.username|default:"N/A" }}</td>
+                            <td>{{ canal.membros.count }}</td>
+                            <td>
+                                {% if canal.ativo %}
+                                    <span class="badge badge-success">Ativo</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ canal.created_at|date:"d/m/Y" }}</td>
+                            <td>
+                                <a href="{% url 'deletar_canal' canal.id %}" class="btn-delete" onclick="return confirm('Tem certeza que deseja deletar este canal?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cargos -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-id-badge"></i> Cargos</h2>
+            </div>
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Descrição</th>
+                            <th>Cor</th>
+                            <th>Criado por</th>
+                            <th>Criado em</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cargo in cargos %}
+                        <tr>
+                            <td><strong>{{ cargo.nome }}</strong></td>
+                            <td>{{ cargo.descricao|truncatewords:10|default:"-" }}</td>
+                            <td>
+                                <span class="color-badge" style="background-color: {{ cargo.cor }};">{{ cargo.cor }}</span>
+                            </td>
+                            <td>{{ cargo.criado_por.fullname|default:cargo.criado_por.username|default:"N/A" }}</td>
+                            <td>{{ cargo.created_at|date:"d/m/Y" }}</td>
+                            <td>
+                                <a href="{% url 'deletar_cargo' cargo.id %}" class="btn-delete" onclick="return confirm('Tem certeza que deseja deletar este cargo?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

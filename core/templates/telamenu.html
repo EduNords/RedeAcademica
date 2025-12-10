@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rede Acadêmica - Menu</title>
+  <link rel="stylesheet" href="{% static 'css/styletelamenu.css' %}">
+</head>
+<body data-tema="claro">
+  <!-- ==================== NAVBAR ==================== -->
+  <header>
+    <div class="navbar-esquerda">
+      <div class="icone-menu"></div>
+    </div>
+
+    <div class="navbar-direita">
+      <!-- lupa -->
+      <div class="icone-nav" aria-label="Pesquisar">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke-width="2"></circle>
+          <line x1="16" y1="16" x2="21" y2="21" stroke-width="2"></line>
+        </svg>
+      </div>
+
+      <!-- sino vazio -->
+      <div class="icone-nav" aria-label="Notificações">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 4C9.8 4 8 5.8 8 8V10.3C8 10.8 7.8 11.3 7.5 11.7L6.4 13.2C5.7 14.2 6.4 15.6 7.6 15.6H16.4C17.6 15.6 18.3 14.2 17.6 13.2L16.5 11.7C16.2 11.3 16 10.8 16 10.3V8C16 5.8 14.2 4 12 4Z"
+            stroke-width="2"
+            stroke-linecap="round"
+          ></path>
+          <path
+            d="M10 17C10.3 18.1 11.1 19 12.3 19C13.5 19 14.3 18.1 14.6 17"
+            stroke-width="2"
+            stroke-linecap="round"
+          ></path>
+        </svg>
+      </div>
+
+      <!-- sino cheio (decorativo) -->
+      <div class="icone-nav" aria-label="Notificações importantes">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 4C9.8 4 8 5.8 8 8V10.3C8 10.8 7.8 11.3 7.5 11.7L6.4 13.2C5.7 14.2 6.4 15.6 7.6 15.6H16.4C17.6 15.6 18.3 14.2 17.6 13.2L16.5 11.7C16.2 11.3 16 10.8 16 10.3V8C16 5.8 14.2 4 12 4Z"
+            stroke-width="2"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+          <circle cx="17.5" cy="6.5" r="2.5" fill="#FFD84D" />
+        </svg>
+      </div>
+
+      <!-- BOTÃO SOL/LUA -->
+      <button
+        id="botao-tema"
+        class="botao-tema"
+        type="button"
+        aria-label="Alternar tema"
+      >
+        <span class="icone-sol" aria-hidden="true">
+          <!-- Sol -->
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4" />
+            <line x1="12" y1="2"  x2="12" y2="5"  stroke-width="1.8" stroke-linecap="round" />
+            <line x1="12" y1="19" x2="12" y2="22" stroke-width="1.8" stroke-linecap="round" />
+            <line x1="4.5" y1="4.5" x2="6.5" y2="6.5" stroke-width="1.8" stroke-linecap="round" />
+            <line x1="17.5" y1="17.5" x2="19.5" y2="19.5" stroke-width="1.8" stroke-linecap="round" />
+            <line x1="2"   y1="12"   x2="5"  y2="12"  stroke-width="1.8" stroke-linecap="round" />
+            <line x1="19"  y1="12"   x2="22" y2="12"  stroke-width="1.8" stroke-linecap="round" />
+            <line x1="4.5" y1="19.5" x2="6.5" y2="17.5" stroke-width="1.8" stroke-linecap="round" />
+            <line x1="17.5" y1="6.5" x2="19.5" y2="4.5" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </span>
+
+        <span class="icone-lua" aria-hidden="true">
+          <!-- Lua no lugar do círculo -->
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19.5 15.2C18.6 15.5 17.7 15.7 16.8 15.7C11.9 15.7 8 11.8 8 6.9C8 6 8.2 5.1 8.5 4.2C8.7 3.5 8.4 2.7 7.8 2.3C7.2 1.9 6.4 1.9 5.8 2.2C3.1 3.6 1.5 6.4 1.5 9.5C1.5 15 5.9 19.5 11.4 19.5C14.5 19.5 17.3 17.9 18.7 15.2"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+
+        <span class="thumb"></span>
+      </button>
+
+      <!-- avatar -->
+      <div class="avatar-usuario"></div>
+    </div>
+  </header>
+
+  <!-- ==================== CONTEÚDO EXEMPLO ==================== -->
+  <main>
+    <h1 class="saudacao">Olá, {usuário}</h1>
+    <p class="subtitulo">
+      Fique de olho nas notícias e nos horários para não perder nada!
+    </p>
+
+    <section class="grid-cards">
+      <article class="card">
+        <h3>Resultado da competição</h3>
+        <p>
+          Resultado da competição nacional... (aqui entraria o conteúdo real do
+          seu dashboard).
+        </p>
+      </article>
+      <article class="card">
+        <h3>Mensagens da equipe</h3>
+        <p>Recados rápidos dos coordenadores, capitães etc.</p>
+      </article>
+      <article class="card">
+        <h3>Calendário</h3>
+        <p>Seus próximos eventos, provas e prazos importantes.</p>
+      </article>
+    </section>
+  </main>
+
+  <!-- ==================== MODAL TEMA DO SITE ==================== -->
+  <div id="overlay-tema" class="overlay-tema">
+    <div id="modal-tema" class="modal-tema">
+      <button class="modal-fechar" type="button" aria-label="Fechar">
+        &times;
+      </button>
+      <h2>Tema do Site</h2>
+      <p class="sub">
+        Escolha como você prefere visualizar a Rede Acadêmica
+      </p>
+
+      <div class="opcoes-tema">
+        <div class="card-tema" data-tema-card="claro">
+          <h3>Modo Claro</h3>
+          <div class="preview-tema">
+            <div class="barra-topo"></div>
+            <div class="linha"></div>
+            <div class="linha curta"></div>
+            <div class="botao-preview"></div>
+          </div>
+        </div>
+
+        <div class="card-tema" data-tema-card="escuro">
+          <h3>Modo Escuro</h3>
+          <div class="preview-tema">
+            <div class="barra-topo"></div>
+            <div class="linha"></div>
+            <div class="linha curta"></div>
+            <div class="botao-preview"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'siteweb/js/telamenu.js' %}"></script>
+</body>
+</html>
